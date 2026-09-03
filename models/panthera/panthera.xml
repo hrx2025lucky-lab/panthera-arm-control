@@ -1,0 +1,85 @@
+<mujoco model="panthera_ht">
+  <compiler angle="radian" meshdir="meshes"/>
+
+  <asset>
+    <mesh name="base_link" content_type="model/stl" file="base_link.STL"/>
+    <mesh name="link1" content_type="model/stl" file="link1.STL"/>
+    <mesh name="link2" content_type="model/stl" file="link2.STL"/>
+    <mesh name="link3" content_type="model/stl" file="link3.STL"/>
+    <mesh name="link4" content_type="model/stl" file="link4.STL"/>
+    <mesh name="link5" content_type="model/stl" file="link5.STL"/>
+    <mesh name="link6_ttb" content_type="model/stl" file="link6_ttb.STL"/>
+  </asset>
+
+  <worldbody>
+    <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="base_link"/>
+    <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="base_link"/>
+    <body name="link1" pos="0 0 0.0584">
+      <inertial pos="0.00278873 -0.00094387 0.0249184" quat="0.692661 0.650108 0.225614 -0.216051" mass="0.281016" diaginertia="0.000421358 0.000343661 0.000213101"/>
+      <joint name="joint1" range="-2.4 2.4" actuatorfrcrange="-21 21" armature="0.012960" damping="0.0600" frictionloss="0.2000"/>
+      <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link1"/>
+      <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link1"/>
+      <body name="link2" pos="0.018199 0 0.053">
+        <inertial pos="-0.129362 -0.00213339 7.183e-05" quat="0.00988446 0.706238 0.00888299 0.70785" mass="1.51651" diaginertia="0.0227212 0.0226105 0.00044695"/>
+        <joint name="joint2" range="0 3.2" actuatorfrcrange="-36 36" axis="0 1 0" armature="0.012960" damping="0.0600" frictionloss="0.1500"/>
+        <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link2"/>
+        <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link2"/>
+        <body name="link3" pos="-0.26 0 0">
+          <inertial pos="0.163431 -0.00164646 0.0533743" quat="-0.0903299 0.649643 -0.0759146 0.751027" mass="0.669178" diaginertia="0.00543522 0.00538336 0.00051072"/>
+          <joint name="joint3" range="0 4" actuatorfrcrange="-36 36" axis="0 -1 0" armature="0.012960" damping="0.0600" frictionloss="0.1500"/>
+          <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link3"/>
+          <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link3"/>
+          <body name="link4" pos="0.23 0 0.06">
+            <inertial pos="0.0524013 -0.00055249 0.0409418" quat="-0.0119308 0.442275 0.0207973 0.896559" mass="0.307805" diaginertia="0.000483913 0.000395159 0.000124278"/>
+            <joint name="joint4" range="-1.6 1.6" actuatorfrcrange="-21 21" axis="0 -1 0" armature="0.012960" damping="0.0300" frictionloss="0.1500"/>
+            <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link4"/>
+            <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link4"/>
+            <body name="link5" pos="0.07 0 0.036319">
+              <inertial pos="0.00319091 8.677e-05 -0.0364178" quat="0.707308 -0.00204013 0.0109461 0.706818" mass="0.283969" diaginertia="0.000134559 0.000126913 0.000107868"/>
+              <joint name="joint5" range="-1.7 1.7" actuatorfrcrange="-10 10" axis="0 0 -1" armature="0.009000" damping="0.0200" frictionloss="0.0400"/>
+              <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link5"/>
+              <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link5"/>
+              <body name="link6" pos="0.02345 0 -0.039">
+                <inertial pos="0.107318 0 9.64e-06" quat="0 0.707172 0 0.707042" mass="0.340735" diaginertia="0.00247492 0.00227113 0.00025204"/>
+                <joint name="joint6" range="-2.5 2.5" actuatorfrcrange="-10 10" axis="1 0 0" armature="0.009000" damping="0.0200" frictionloss="0.0400"/>
+                <geom type="mesh" contype="0" conaffinity="0" group="1" rgba="0.752941 0.752941 0.752941 1" density="0" mesh="link6_ttb"/>
+                <geom type="mesh" rgba="0.752941 0.752941 0.752941 1" mesh="link6_ttb"/>
+                <site name="tcp" pos="0.1893 0.0 0.0" size="0.008" rgba="0 1 0 0.6"/>
+              </body>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <motor name="joint1_mot" joint="joint1" ctrlrange="-10.0 10.0" ctrllimited="true" forcerange="-10.0 10.0"/>
+    <motor name="joint2_mot" joint="joint2" ctrlrange="-20.0 20.0" ctrllimited="true" forcerange="-20.0 20.0"/>
+    <motor name="joint3_mot" joint="joint3" ctrlrange="-20.0 20.0" ctrllimited="true" forcerange="-20.0 20.0"/>
+    <motor name="joint4_mot" joint="joint4" ctrlrange="-10.0 10.0" ctrllimited="true" forcerange="-10.0 10.0"/>
+    <motor name="joint5_mot" joint="joint5" ctrlrange="-5.0 5.0" ctrllimited="true" forcerange="-5.0 5.0"/>
+    <motor name="joint6_mot" joint="joint6" ctrlrange="-5.0 5.0" ctrllimited="true" forcerange="-5.0 5.0"/>
+  </actuator>
+
+  <sensor>
+    <jointpos name="joint1_pos" joint="joint1"/>
+    <jointvel name="joint1_vel" joint="joint1"/>
+    <jointactuatorfrc name="joint1_frc" joint="joint1"/>
+    <jointpos name="joint2_pos" joint="joint2"/>
+    <jointvel name="joint2_vel" joint="joint2"/>
+    <jointactuatorfrc name="joint2_frc" joint="joint2"/>
+    <jointpos name="joint3_pos" joint="joint3"/>
+    <jointvel name="joint3_vel" joint="joint3"/>
+    <jointactuatorfrc name="joint3_frc" joint="joint3"/>
+    <jointpos name="joint4_pos" joint="joint4"/>
+    <jointvel name="joint4_vel" joint="joint4"/>
+    <jointactuatorfrc name="joint4_frc" joint="joint4"/>
+    <jointpos name="joint5_pos" joint="joint5"/>
+    <jointvel name="joint5_vel" joint="joint5"/>
+    <jointactuatorfrc name="joint5_frc" joint="joint5"/>
+    <jointpos name="joint6_pos" joint="joint6"/>
+    <jointvel name="joint6_vel" joint="joint6"/>
+    <jointactuatorfrc name="joint6_frc" joint="joint6"/>
+  </sensor>
+</mujoco>
