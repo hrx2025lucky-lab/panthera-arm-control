@@ -187,6 +187,7 @@ docs/                参数辨识与 sim2real 方案、新对话交接 prompt
 | 通信 | CAN 1 Mbps，**CAN FD 5 Mbps** |
 | 模组控制频率 | 3 kHz |
 | 官方 SDK | [`Panthera-HT_SDK`](https://github.com/HighTorque-Robotics/Panthera-HT_SDK)（MIT） |
+| 控制协议 | **MIT 模式**（源自 MIT Mini Cheetah）：一帧下发 pos / vel / kp / kd / τ_ff，<br>电机内部按 τ = kp·Δq + kd·Δq̇ + τ_ff 以 3 kHz 执行。<br>⭐ kp=kd=0 即纯力矩（CTC 走这个）；kp 大即位置控制（RL 走这个）。<br>详见 [`docs/RL_sim2real流程.md`](docs/RL_sim2real流程.md) §零 |
 
 ⚠️ **力矩限幅有三个来源，别混**：
 
