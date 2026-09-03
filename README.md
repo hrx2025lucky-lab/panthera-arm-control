@@ -89,6 +89,55 @@ python tools/urdf_to_mjcf.py \
 
 ---
 
+## 统一后端：同一份控制代码，仿真与真机都能跑
+
+```python
+from panthera.driver.mujoco_backend import MujocoBackend
+from panthera.core.robot import Q_HOME
+
+with MujocoBackend() as be:          # 换成 RealBackend() 即上真机，控制代码不动
+    be.reset(Q_HOME)
+    for _ in range(1500):
+        s = be.read()
+        be.send_torque(be.gravity(s.q))
+        be.step()
+```
+
+⭐ **为什么要这一层**：如果仿真和真机的接口不同，会出现最难查的一类错误——
+控制器搬到真机上因为**接口语义差一点**而行为不同，而你会以为那是 sim2real gap。
+判据就脏了。
+
+⚠️ `RealBackend` 目前是骨架。接入前必须先做四件事（见 `driver/mujoco_backend.py`
+的 docstring）：实测控制频率、单关节先行、看门狗、验证限幅生效。
+
+---
+
+## sim2real 流程
+
+```
+辨识参数 ──→ 同步进 IsaacLab(USD) 与 MuJoCo(MJCF)
+                  │                    │
+            训练(PPO, 数千并行)          │
+                  │                    │
+               策略 ──── sim2sim 验证 ──┘   ← ⭐ 独立引擎交叉检验
+                  │
+                真机部署
+```
+
+⭐ 中间那步是**两个物理引擎的独立实现**（PhysX vs MuJoCo 求解器）在互验：
+策略在 A 能跑、到 B 就废 ⇒ 它过拟合了 A 的数值特性，而不是学到了物理。
+
+⚠️ **前提是两边模型一致**——`armature` 最容易在 URDF→USD 转换里丢掉。
+丢了以后 sim2sim 对不上，你会以为是「引擎差异」，实际是「模型没对齐」。
+所以有 [`tests/test_model_parity.py`](panthera/tests/test_model_parity.py)：
+导出**物理指纹**（质量 / armature / 摩擦 / 限幅 / 减速比），在 Isaac 侧也导一遍逐项 diff。
+
+```bash
+PYTHONPATH=. python -m panthera.tests.test_model_parity   # 打印物理指纹
+```
+
+---
+
 ## 目录
 
 ```
@@ -96,11 +145,12 @@ panthera/
 ├── core/            运动学、雅可比、动力学（M, C, g, Λ）
 ├── control/         阻抗控制（⚠️ 零空间项在 6 轴上恒为零）
 ├── identification/  回归矩阵 τ = Y(q,q̇,q̈)π、基参数、离线最小二乘
-├── driver/          真机 SDK 桥接（待接入 hightorque_robot）
+├── driver/          统一后端：backend.py(接口) + mujoco_backend.py
+│                   ⚠️ RealBackend 待接入 hightorque_robot
 └── tests/           冒烟测试
 models/panthera/     MJCF + 网格（由 tools/urdf_to_mjcf.py 生成）
 tools/               URDF → MJCF 转换
-docs/                迁移说明、参数辨识与 sim2real 方案
+docs/                参数辨识与 sim2real 方案、新对话交接 prompt
 ```
 
 ---
