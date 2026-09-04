@@ -23,9 +23,7 @@ def rig():
     reg = DynamicsRegressor(XML, n_arm=6)
     P, _ = reg.base_parameter_projection(samples=400)
     m = robot.model
-    limits = ex.TrajectoryLimits(
-        q_lower=m.jnt_range[:6, 0].copy(), q_upper=m.jnt_range[:6, 1].copy(),
-        qd_max=np.full(6, 2.0), tau_max=TAU_MAX)
+    limits = ex.official_limits(m)
     return reg, P, limits
 
 
@@ -238,3 +236,70 @@ class TestNoiseAmplification:
                                 dt=0.004, noise_std=std, seed=5)
             errs.append(pl.identify(Y, tau, P, pi_true=pi_true)["beta_error"])
         assert 2.0 < errs[1] / errs[0] < 8.0
+
+
+class TestOfficialLimits:
+    """⚠️⚠️ 限值必须来自官方配置，不能自己填。
+
+    本项目最初把 ``qd_max`` 拍成 2.0、**完全没有加速度约束**，
+    优化出的"合规"轨迹 `实测` 超官方速度 **68%**、超加速度 **57%**——
+    而 ``violation()`` 报 0，因为它照着错误的限值检查。
+
+    ⭐ **一个照着错误标准检查的检查器，比没有检查器更危险。**
+
+    权威出处 ``Panthera-HT_SDK/panthera_python/robot_param/Follower.yaml``::
+
+        velocity_limits:     [1.0]*6
+        acceleration_limits: [2.0]*6
+    """
+
+    def test_official_values_match_the_sdk_config(self):
+        np.testing.assert_array_equal(ex.OFFICIAL_QD_MAX, np.full(6, 1.0))
+        np.testing.assert_array_equal(ex.OFFICIAL_QDD_MAX, np.full(6, 2.0))
+        np.testing.assert_array_equal(ex.SDK_TAU_MAX,
+                                      [10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
+
+    def test_acceleration_is_actually_constrained(self, rig):
+        """⭐ 不带 qdd_max 的约束对超加速度**完全无感**。
+
+        这条测试证明加速度约束真的在起作用，而不只是个没人读的字段。
+        """
+        reg, P, limits = rig
+        fast = ex.random_trajectory(np.array(Q_HOME), 5, 2.0, 0.6, seed=5)
+        _, _, qdd = fast(np.linspace(0, fast.period, 200))
+        assert np.abs(qdd).max() > 2.0                     # 确实超了
+
+        no_acc = ex.TrajectoryLimits(
+            limits.q_lower, limits.q_upper, limits.qd_max, limits.tau_max)
+        assert ex.violation(fast, limits) > ex.violation(fast, no_acc)
+
+    def test_optimized_trajectory_respects_official_limits(self, rig):
+        """⭐ 端到端：优化结果必须同时满足官方速度**和**加速度限值。"""
+        reg, P, limits = rig
+        best, _ = ex.optimize(
+            ex.random_trajectory(np.array(Q_HOME), 5, 0.6, 0.35, seed=3),
+            reg.regressor, P, limits, iterations=250, n_samples=60, seed=1)
+        rep = ex.evaluate(best, reg.regressor, P, limits, rnea_fn=reg.rnea)
+
+        assert rep["violation"] == 0.0
+        assert rep["qd_max_abs"] <= 1.0                    # 官方速度限值
+        assert rep["qdd_max_abs"] <= 2.0                   # 官方加速度限值
+        assert rep["tau_saturation_pct"] == 0.0
+        assert rep["cond_log"] < 3.0                       # 合规的代价可接受
+
+    def test_compliance_costs_little_conditioning(self, rig):
+        """⚠️ 记录代价：收紧到官方限值后 log10κ 从 2.10 涨到约 2.35。
+
+        条件数从 126 涨到 224——`理论` 噪声放大约 1.8 倍，仍然完全可用。
+        **合规的代价很小，没有理由为了好看的条件数去超限。**
+        """
+        reg, P, limits = rig
+        loose = ex.TrajectoryLimits(
+            limits.q_lower, limits.q_upper, np.full(6, 2.0), limits.tau_max)
+        start = ex.random_trajectory(np.array(Q_HOME), 5, 0.6, 0.35, seed=3)
+        k_official = ex.optimize(start, reg.regressor, P, limits,
+                                 iterations=250, n_samples=60, seed=1)[1][-1][1]
+        k_loose = ex.optimize(start, reg.regressor, P, loose,
+                              iterations=250, n_samples=60, seed=1)[1][-1][1]
+        assert k_official > k_loose                        # 确实有代价
+        assert k_official - k_loose < 0.5                  # 但很小

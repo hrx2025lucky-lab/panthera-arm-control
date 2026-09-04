@@ -155,27 +155,66 @@ class TrajectoryLimits:
 
     * 超关节限位 —— 真机会撞死
     * 超速度上限 —— 真机会报保护
+    * ⭐ 超加速度上限 —— 官方 ``Follower.yaml`` 明确给了 2.0 rad/s²
     * ⭐ **力矩饱和** —— 饱和时实际力矩 ≠ 指令力矩，
       回归方程 $\\tau = Y\\pi$ **根本不成立**，那段数据必须丢弃
+
+    ⚠️⚠️ **限值必须来自官方配置文件，不能自己填。**
+    本项目最初把 ``qd_max`` 拍成 2.0、完全没有加速度约束，
+    结果优化出的"合规"轨迹 `实测` **超速 68%、超加速度 57%**——
+    而 ``violation()`` 报的是 0，因为它照着错误的限值检查。
+
+    权威出处：``Panthera-HT_SDK/panthera_python/robot_param/Follower.yaml``::
+
+        joint_limits: lower [-2.4,-0.1,-0.1,-1.6,-1.7,-2.5]
+                      upper [ 2.4, 3.2, 4.0, 1.6, 1.7, 2.5]
+        velocity_limits:     [1.0]*6
+        acceleration_limits: [2.0]*6
+        max_torque:          [21,36,36,21,10,10]   # ⚠️ 这是堵转扭矩
+
+    ⚠️ ``max_torque`` 那一行是**堵转扭矩**，不是可持续输出。
+    官方示例脚本自己就用了三套不同的限幅（`实测` 统计）：
+    ``[10,20,20,10,5,5]``（2 处）、``[15,30,30,15,5,5]``（8 处）、
+    ``[21,36,36,21,10,10]``（2 处）。本项目取**最保守的第一套**。
     """
 
     q_lower: np.ndarray
     q_upper: np.ndarray
     qd_max: np.ndarray
     tau_max: np.ndarray
+    #: 加速度上限。None 表示不约束（⚠️ 只应在明确知道自己在做什么时用）
+    qdd_max: np.ndarray | None = None
     #: 安全裕度：只用限位的这个比例，给真机留余量
     margin: float = 0.85
+
+
+#: 官方 ``Follower.yaml`` 的限值。⭐ 用它，不要自己填数。
+OFFICIAL_QD_MAX = np.full(6, 1.0)
+OFFICIAL_QDD_MAX = np.full(6, 2.0)
+#: 官方示例中最保守的一套力矩限幅（另有 15/30 与 21/36 两套，见上）
+SDK_TAU_MAX = np.array([10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
+
+
+def official_limits(model, margin: float = 0.85) -> TrajectoryLimits:
+    """按官方配置构造约束。⭐ 新代码一律用这个，不要手工拼 TrajectoryLimits。"""
+    return TrajectoryLimits(
+        q_lower=model.jnt_range[:6, 0].copy(),
+        q_upper=model.jnt_range[:6, 1].copy(),
+        qd_max=OFFICIAL_QD_MAX.copy(),
+        tau_max=SDK_TAU_MAX.copy(),
+        qdd_max=OFFICIAL_QDD_MAX.copy(),
+        margin=margin)
 
 
 def violation(traj: FourierTrajectory, limits: TrajectoryLimits,
               n_samples: int = 200) -> float:
     """返回约束违反量（0 表示全部满足）。
 
-    ⭐ 只看位置和速度——力矩要靠动力学模型算，代价高得多，
+    ⭐ 只看位置、速度、加速度——力矩要靠动力学模型算，代价高得多，
     放在评估阶段单独做（见 :func:`evaluate`）。
     """
     t = np.linspace(0.0, traj.period, n_samples)
-    q, qd, _ = traj(t)
+    q, qd, qdd = traj(t)
 
     span = limits.q_upper - limits.q_lower
     lo = limits.q_lower + (1 - limits.margin) * span / 2
@@ -185,7 +224,11 @@ def violation(traj: FourierTrajectory, limits: TrajectoryLimits,
     over_hi = np.maximum(q - hi[None, :], 0.0).sum()
     over_v = np.maximum(np.abs(qd) - limits.margin * limits.qd_max[None, :],
                         0.0).sum()
-    return float(over_lo + over_hi + over_v)
+    total = over_lo + over_hi + over_v
+    if limits.qdd_max is not None:
+        total += np.maximum(np.abs(qdd)
+                            - limits.margin * limits.qdd_max[None, :], 0.0).sum()
+    return float(total)
 
 
 def condition_number(traj: FourierTrajectory, regressor_fn,
@@ -272,6 +315,8 @@ def evaluate(traj: FourierTrajectory, regressor_fn, projection: np.ndarray,
     report = {
         "n_harmonics": traj.n_harmonics,
         "period": traj.period,
+        "qd_limit_pct": float(
+            (np.abs(qd) / limits.qd_max[None, :]).max() * 100.0),
         "cond": condition_number(traj, regressor_fn, projection, n_samples=120),
         "violation": violation(traj, limits, n_samples),
         "q_max_abs": float(np.abs(q).max()),
@@ -280,6 +325,10 @@ def evaluate(traj: FourierTrajectory, regressor_fn, projection: np.ndarray,
         "qd_start": float(np.abs(qd[0]).max()),
     }
     report["cond_log"] = float(np.log10(max(report["cond"], 1e-300)))
+    if limits.qdd_max is not None:
+        # ⭐ 直接报"用掉了限值的百分之几"，比报绝对值更容易看出危险
+        report["qdd_limit_pct"] = float(
+            (np.abs(qdd) / limits.qdd_max[None, :]).max() * 100.0)
 
     if rnea_fn is not None:
         tau = np.array([rnea_fn(q[i], qd[i], qdd[i]) for i in range(len(t))])
