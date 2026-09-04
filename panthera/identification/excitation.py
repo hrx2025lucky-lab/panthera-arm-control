@@ -191,8 +191,16 @@ class TrajectoryLimits:
 #: 官方 ``Follower.yaml`` 的限值。⭐ 用它，不要自己填数。
 OFFICIAL_QD_MAX = np.full(6, 1.0)
 OFFICIAL_QDD_MAX = np.full(6, 2.0)
-#: 官方示例中最保守的一套力矩限幅（另有 15/30 与 21/36 两套，见上）
+#: 官方 Python 示例中最保守的一套力矩限幅（另有 15/30 与 21/36 两套，见上）
 SDK_TAU_MAX = np.array([10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
+
+#: ⚠️ 官方 **ROS2 阻抗控制**用的是更低的腕部限幅：
+#: ``{10, 20, 20, 10, 3, 2}``，源码注释写明
+#: "5/6号腕部电机限幅更低，减少姿态通道激励"。
+#:
+#: ⭐ 做**力矩控制**（尤其阻抗/柔顺）时用这一套，比 SDK_TAU_MAX 更安全：
+#: J5 低 1.67 倍、J6 低 2.5 倍。
+ROS2_IMPEDANCE_TAU_MAX = np.array([10.0, 20.0, 20.0, 10.0, 3.0, 2.0])
 
 
 def official_limits(model, margin: float = 0.85) -> TrajectoryLimits:

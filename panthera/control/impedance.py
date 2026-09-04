@@ -36,10 +36,22 @@ from panthera.core.kinematics import rot_to_axis_angle_error, OrientationErrorTr
 class ImpedanceGains:
     """六维笛卡尔刚度/阻尼。前 3 维平移 (N/m)，后 3 维旋转 (Nm/rad)。"""
 
-    k_trans: float = 400.0
-    k_rot: float = 30.0
+    #: ⚠️ 默认值对齐**官方 ROS2 阻抗示例实测值**，不是从 Panda 沿用的。
+    #:
+    #: 官方 ``pure_cartesian_impedance_control.cpp``::
+    #:
+    #:     K = [140, 140, 140, 1.4, 1.4, 0.9]   # 位置 N/m，姿态 N·m/rad
+    #:     B = [7, 7, 7, 0.5, 0.5, 0.35]
+    #:
+    #: ⭐ 姿态刚度只有 **1.4 / 0.9**，官方注释写明原因：
+    #: "姿态通道保持保守，避免再次激励 5/6 号腕部电机抖动"。
+    #: ⚠️ "再次"两个字说明他们**踩过这个坑**。
+    #: armctrl 从 Panda 沿用的 30 N·m/rad 在这台机器上高 **21~33 倍**，
+    #: 真机上大概率直接激起腕部振荡。
+    k_trans: float = 140.0
+    k_rot: float = 1.2           # 官方 1.4/1.4/0.9 的中间值
     zeta: float = 1.0            # 阻尼比，1.0 为临界阻尼
-    k_null: float = 5.0          # 零空间刚度
+    k_null: float = 5.0          # ⚠️ 6 轴无零空间，此项恒不起作用
     d_null: float = 2.0
 
     def stiffness(self) -> np.ndarray:

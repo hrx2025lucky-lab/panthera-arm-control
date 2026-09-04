@@ -149,8 +149,10 @@ class ImpedanceScene(_PantheraScene):
     )
 
     params = [
-        Param("k_trans", "平移刚度 K", 100.0, 2000.0, 500.0, unit="N/m",
-              effect="⭐ 稳态偏移应精确等于 F/K。K 翻倍，偏移减半。"),
+        Param("k_trans", "平移刚度 K", 20.0, 600.0, 140.0, unit="N/m",
+              effect="⭐ 稳态偏移应精确等于 F/K。K 翻倍，偏移减半。<br>"
+                     "⚠️ 默认 140 是<b>官方 ROS2 阻抗示例的实测值</b>"
+                     "（armctrl 从 Panda 沿用的 500 在这台机器上偏高）。"),
         Param("zeta", "阻尼比 ζ", 0.1, 2.0, 0.8,
               effect="⚠️ 恒力下读数一动不动——阻尼只在「变化过程」中出力。"
                      "想看它的作用，把外力模式切成方波。"),
