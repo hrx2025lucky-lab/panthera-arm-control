@@ -214,7 +214,23 @@ def urdf_to_mjcf(urdf: Path, meshes: Path, out_dir: Path) -> Path:
                 f'    <jointactuatorfrc name="{joint}_frc" joint="{joint}"/>']
     sen.append("  </sensor>\n")
 
-    mjcf = mjcf.replace("</mujoco>", "\n".join(act + sen) + "</mujoco>")
+    # ⑤ ⚠️⚠️ 排除底座与 link1 的碰撞。
+    #
+    # MuJoCo 默认会过滤"父子刚体"之间的碰撞，**但这条规则对 world 不适用**
+    # （父体是 world 时不自动过滤）。而 URDF 里 base_link 的碰撞网格和
+    # link1 的碰撞网格本来就是贴合的，转过来之后就永久互相穿模。
+    #
+    # `实测` 后果：base↔link1 恒有 4 个接触点、穿透 2.3 mm，接触摩擦
+    # **把 J1 的旋转完全锁死**——施加 5 N·m 一秒钟，J1 只转了 0.0001 rad。
+    #
+    # ⭐ 这个 bug 是闭环仿真抓出来的。在它之前的 51 项测试全部通过：
+    # 因为它们只验"公式算得对"，没有一项真的把回路闭起来积分动力学。
+    # 运动学、动力学、回归矩阵、条件数——全都不碰接触求解器。
+    excl = ['\n  <contact>',
+            '    <exclude body1="world" body2="link1"/>',
+            '  </contact>\n']
+
+    mjcf = mjcf.replace("</mujoco>", "\n".join(act + sen + excl) + "</mujoco>")
 
     dst = out_dir / "panthera.xml"
     dst.write_text(mjcf, encoding="utf-8")

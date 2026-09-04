@@ -68,8 +68,21 @@ class MujocoBackend(ArmBackend):
         self._t += self.dt
 
     def reset(self, q: np.ndarray) -> None:
-        """把仿真状态设到给定构型。**真机后端没有这个方法**——真机不能瞬移。"""
-        self.robot.set_state(q)
+        """把仿真状态**完整**复位到给定构型。**真机后端没有这个方法**——真机不能瞬移。
+
+        ⚠️ 必须走 ``mj_resetData``，不能只写 qpos。
+        ``ArmModel.set_state(q)`` 在 ``qd=None`` 时**不清零速度**，
+        于是上一次 rollout 的末速度会被带进下一次——
+        `实测` 同一组增益（CTC wn=45）因执行顺序不同，
+        峰值力矩读出 4.86 或 15.88 N·m 两个值。
+
+        ⭐ **一个结果依赖执行顺序的测试跑道是没有判据可言的。**
+        这个 bug 由"把同一组增益放在不同位置跑两遍"发现——
+        单次运行永远看不出来。
+        """
+        mujoco.mj_resetData(self.model, self.data)
+        self.robot.set_state(np.asarray(q, dtype=float),
+                             np.zeros(self.robot.n))
         self._t = 0.0
         self._queue = collections.deque([np.zeros(self.n)] * self._latency)
 

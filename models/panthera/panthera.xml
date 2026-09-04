@@ -82,4 +82,8 @@
     <jointvel name="joint6_vel" joint="joint6"/>
     <jointactuatorfrc name="joint6_frc" joint="joint6"/>
   </sensor>
+
+  <contact>
+    <exclude body1="world" body2="link1"/>
+  </contact>
 </mujoco>
