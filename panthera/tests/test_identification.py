@@ -259,6 +259,37 @@ class TestOfficialLimits:
         np.testing.assert_array_equal(ex.SDK_TAU_MAX,
                                       [10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
 
+    def test_rated_torque_matches_vendor_answer(self):
+        """⭐⭐ 客服 Q9 的权威回答：额定 J1/J4=6，J2/J3=10，J5/J6=6。"""
+        np.testing.assert_array_equal(ex.RATED_TAU, [6.0, 10.0, 10.0, 6.0, 6.0, 6.0])
+        np.testing.assert_array_equal(ex.STALL_TAU,
+                                      [21.0, 36.0, 36.0, 21.0, 10.0, 10.0])
+
+    def test_identification_uses_rated_not_peak(self, rig):
+        """⭐⭐ 辨识是**连续运行**（10 分钟以上），必须用额定力矩。
+
+        ⚠️ 我们此前用 SDK_TAU_MAX，在 J1–J4 上全部超额定：
+        J1/J4 超 67%、**J2/J3 超 100%**。客服明确回答
+        「连续运行应控制在额定值以内」。
+        """
+        _, _, limits = rig
+        np.testing.assert_array_equal(limits.tau_max, ex.RATED_TAU)
+        assert np.all(ex.RATED_TAU < ex.SDK_TAU_MAX[:4].max())
+
+    def test_rated_limit_costs_nothing(self, rig):
+        """⭐ 收紧到额定值**没有代价**——之前那个宽限幅从没被用上过。
+
+        `实测`：额定值下轨迹最大只用掉 44.5%，log10κ 仍是 2.35。
+        """
+        reg, P, limits = rig
+        best, _ = ex.optimize(
+            ex.random_trajectory(np.array(Q_HOME), 5, 0.6, 0.35, seed=3),
+            reg.regressor, P, limits, iterations=250, n_samples=60, seed=1)
+        rep = ex.evaluate(best, reg.regressor, P, limits, rnea_fn=reg.rnea)
+        assert rep["tau_saturation_pct"] == 0.0
+        assert rep["tau_max_abs"] < 0.6 * limits.tau_max.min() * 2
+        assert rep["cond_log"] < 3.0
+
     def test_acceleration_is_actually_constrained(self, rig):
         """⭐ 不带 qdd_max 的约束对超加速度**完全无感**。
 

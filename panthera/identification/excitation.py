@@ -191,7 +191,25 @@ class TrajectoryLimits:
 #: 官方 ``Follower.yaml`` 的限值。⭐ 用它，不要自己填数。
 OFFICIAL_QD_MAX = np.full(6, 1.0)
 OFFICIAL_QDD_MAX = np.full(6, 2.0)
-#: 官方 Python 示例中最保守的一套力矩限幅（另有 15/30 与 21/36 两套，见上）
+#: ⭐⭐ **额定力矩**——客服 Q9 明确回答的权威值，**连续运行必须用这一套**。
+#:
+#: 客服原文：「额定/堵转力矩（N·m）：J1/J4=6/21，J2/J3=10/36，J5/J6=6/10」
+#: 「**连续运行应控制在额定值以内**」
+#:
+#: ⚠️⚠️ 我们此前用的 ``SDK_TAU_MAX`` 在 J1–J4 上**全部超过额定值**：
+#: J1/J4 超 67%，**J2/J3 超 100%**。而辨识轨迹要连续跑 10 分钟以上——
+#: 那是烧电机的风险。
+#:
+#: ⭐ `实测` 改用额定值后，激励轨迹**毫无损失**：
+#: 最大只用掉额定的 44.5%，log10κ 仍是 2.35。
+#: 也就是说之前那个宽限幅**从来没被用上过**，白担风险。
+RATED_TAU = np.array([6.0, 10.0, 10.0, 6.0, 6.0, 6.0])
+
+#: 堵转力矩。⛔ **绝对上限，任何情况下不许超**。
+STALL_TAU = np.array([21.0, 36.0, 36.0, 21.0, 10.0, 10.0])
+
+#: 官方 Python 示例中最保守的一套（另有 15/30 与 21/36 两套）。
+#: ⚠️ 只适用于**短时峰值**，不可用于连续运行——见 :data:`RATED_TAU`。
 SDK_TAU_MAX = np.array([10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
 
 #: ⚠️ 官方 **ROS2 阻抗控制**用的是更低的腕部限幅：
@@ -209,7 +227,8 @@ def official_limits(model, margin: float = 0.85) -> TrajectoryLimits:
         q_lower=model.jnt_range[:6, 0].copy(),
         q_upper=model.jnt_range[:6, 1].copy(),
         qd_max=OFFICIAL_QD_MAX.copy(),
-        tau_max=SDK_TAU_MAX.copy(),
+        # ⭐ 辨识是**连续运行**（10 分钟以上），必须用额定值
+        tau_max=RATED_TAU.copy(),
         qdd_max=OFFICIAL_QDD_MAX.copy(),
         margin=margin)
 
