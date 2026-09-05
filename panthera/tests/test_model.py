@@ -159,3 +159,58 @@ class TestImpedanceControl(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestTcpMatchesOfficialSdk:
+    """⭐⭐ TCP 必须和官方 SDK 的 ``tool_link`` 一致。
+
+    ⚠️ 这组测试是补出来的：把 TCP 从 0.1893 改到 0.165（差 **24.3 mm**），
+    原有 170 项测试**全部照常通过**——说明当时**根本没有守护这个值**。
+
+    后果如果没被发现：调用 SDK 的 ``forward_kinematics`` /
+    ``inverse_kinematics`` 做对照时，所有笛卡尔量都有 24 mm 的系统偏差，
+    而且会被误判成"模型不准"去调别的地方。
+
+    官方三个不同的末端点定义（`实测` 从 URDF 读出）：
+
+    ==========================  ========  ==========================
+    出处                         偏置 (m)   是什么
+    ==========================  ========  ==========================
+    SDK ``tool_link``           0.165     ⭐ 官方 TCP
+    ROS2 ``bat_center``         0.18      电池中心，**不是** TCP
+    我们最初量的裸法兰            0.1893    ⚠️ 已废弃
+    ==========================  ========  ==========================
+    """
+
+    def test_tcp_offset_is_the_official_tool_link(self):
+        import numpy as np
+        from panthera.core.robot import PANTHERA_TCP_OFFSET
+        np.testing.assert_allclose(PANTHERA_TCP_OFFSET, [0.165, 0.0, 0.0])
+
+    def test_mjcf_site_matches_the_constant(self):
+        """⚠️ MJCF 里的 site 和 Python 常量必须一致——
+        两处各改一半是最容易漏的错。"""
+        import re
+
+        import numpy as np
+        from panthera.assets import panthera_xml
+        from panthera.core.robot import PANTHERA_TCP_OFFSET
+        xml = open(panthera_xml(), encoding="utf-8").read()
+        m = re.search(r'<site name="tcp" pos="([^"]+)"', xml)
+        assert m, "MJCF 里找不到 tcp site"
+        np.testing.assert_allclose(
+            [float(v) for v in m.group(1).split()], PANTHERA_TCP_OFFSET)
+
+    def test_converter_uses_the_same_offset(self):
+        """⚠️ 转换脚本也要一致，否则重新生成模型时会退回旧值。"""
+        import re
+
+        import numpy as np
+        from pathlib import Path
+        from panthera.core.robot import PANTHERA_TCP_OFFSET
+        src = (Path(__file__).resolve().parents[2]
+               / "tools" / "urdf_to_mjcf.py").read_text(encoding="utf-8")
+        m = re.search(r'TCP_OFFSET = \(([^)]+)\)', src)
+        assert m
+        np.testing.assert_allclose(
+            [float(v) for v in m.group(1).split(",")], PANTHERA_TCP_OFFSET)

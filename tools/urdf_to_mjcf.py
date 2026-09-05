@@ -64,7 +64,11 @@ TORQUE_LIMIT = {"joint1": 10.0, "joint2": 20.0, "joint3": 20.0,
                 "joint4": 10.0, "joint5": 5.0, "joint6": 5.0}
 
 #: TCP 相对 link6 原点的偏置（m）。裸法兰口径，装夹爪后必须重标。
-TCP_OFFSET = (0.1893, 0.0, 0.0)
+#: ⭐ TCP 必须和官方 SDK 的 ``tool_link`` 一致（Follower.yaml 的
+#: ``end_effector_link``），否则和 SDK 的 FK/IK 对不上。
+#: ⚠️ 官方有三个不同的末端点：tool_link 0.165（TCP）、
+#: bat_center 0.18（电池中心，不是 TCP）、我们最初量的裸法兰 0.1893（已废弃）。
+TCP_OFFSET = (0.165, 0.0, 0.0)
 
 
 # ---------------------------------------------------------------- STL 工具

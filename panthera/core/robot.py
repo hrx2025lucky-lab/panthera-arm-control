@@ -17,7 +17,8 @@
 `ee_body` 给出末端**连杆**，`tcp_offset` 给出该连杆坐标系下的工具中心点偏置。
 `fk()` / `jacobian()` / `task_space_inertia()` 全部作用在 **TCP** 上，而不是连杆原点。
 
-Panthera 的末端连杆是 `link6`，TCP 取法兰面外 0.1893 m（MJCF 里的 `tcp` site）。
+Panthera 的末端连杆是 `link6`，TCP 取 `link6` 外 0.165 m——
+**与官方 SDK 的 `tool_link` 一致**（见 `PANTHERA_TCP_OFFSET`）。
 把控制点放在连杆原点会让阻抗刚度、IK 目标和可操作度全都算在一个**不接触工件**的
 点上，是语义错误。需要法兰位姿时用 `flange_pose()`。
 
@@ -299,15 +300,34 @@ class ArmModel:
         return np.clip(tau, -self.tau_limit, self.tau_limit)
 
 
-#: Panthera-HT 的 TCP：`link6` 坐标系下 x 方向 0.1893 m（MJCF 里的 `tcp` site）。
+#: Panthera-HT 的 TCP：`link6` 坐标系下 x 方向 **0.165 m**。
 #:
-#: ⚠️ 这是**裸法兰**（不含夹爪）的口径，与 MJCF 中 site 的定义保持一致。
-#: 装上官方两指夹爪后，抓取中心会继续外移，必须重新标定——
-#: 沿用裸法兰偏置会让阻抗刚度和 IK 目标算在一个不接触工件的点上，是语义错误。
+#: ⭐ 这个数**必须和官方 SDK 一致**，否则调用 SDK 的 `forward_kinematics` /
+#: `inverse_kinematics` 做对照时，所有笛卡尔量都会有系统偏差。
+#: 权威出处：``Follower.yaml`` 的 ``end_effector_link: "tool_link"``，
+#: 而 ``tool_link`` 在 URDF 里定义为 ``link6`` 的 ``[0.165, 0, 0]``。
+#:
+#: ⚠️⚠️ 官方一共有**三个不同的末端点定义**，别搞混：
+#:
+#: ==========================  ========  ==========================
+#: 出处                         偏置 (m)   是什么
+#: ==========================  ========  ==========================
+#: SDK ``tool_link``           **0.165**  ⭐ 官方 TCP（本项目用这个）
+#: ROS2 ``bat_center``         0.18       电池中心，**不是** TCP
+#: 我们最初从网格量的"裸法兰"    0.1893     ⚠️ 已废弃
+#: ==========================  ========  ==========================
+#:
+#: `实测` 0.1893 vs 0.165 的差异：位置差 **24.3 mm**、雅可比差 2.1%，
+#: 阻抗控制 K=140 N/m 时等价于 **3.4 N** 的力误差。
+#:
+#: ⚠️ 装上官方两指夹爪后，抓取中心会继续外移，必须重新标定。
 #:
 #: 与 Panda 的差异：Panda 的末端轴是 z，Panthera 的 joint6 绕 x 转，
 #: 所以偏置方向也是 x 而不是 z。
-PANTHERA_TCP_OFFSET = np.array([0.1893, 0.0, 0.0])
+PANTHERA_TCP_OFFSET = np.array([0.165, 0.0, 0.0])
+
+#: ⚠️ 已废弃的旧口径，仅用于复现历史结果。
+LEGACY_FLANGE_OFFSET = np.array([0.1893, 0.0, 0.0])
 
 #: 官方 SDK 示例里的默认姿态（`2_Jointimpendence_control_with_gra_fri_pd.py`）。
 #: 用它做仿真与真机的公共起始点，两边读数才可比。
@@ -317,7 +337,7 @@ Q_HOME = np.array([0.0, 0.7, 0.7, -0.1, 0.0, 0.0])
 def make_panthera(xml_path: str | None = None, tcp: str = "flange") -> ArmModel:
     """构造高擎 Panthera-HT（6 自由度）模型。
 
-    tcp="flange"  控制点在法兰外 0.1893 m 的 `tcp` site（缺省）
+    tcp="flange"  控制点在 link6 外 0.165 m（= 官方 tool_link，缺省）
     tcp="link6"   控制点在 link6 连杆原点（仅供对照）
 
     ⚠️ 6 自由度对 6 维任务空间**没有冗余**，零空间维度为 0。
