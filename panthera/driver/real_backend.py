@@ -20,7 +20,8 @@
 1. **实测控制频率**。官方示例是 ``sleep(0.002)``＝500 Hz，但那是**期望值**
    不是实测值；另一些示例用的是 200 Hz 甚至 100 Hz。
    先测出真实节拍再把 ``dt`` 设成它——否则所有基于 Δt 的推导都是错的。
-2. **单关节先行**。从一个关节、``tau=0`` 开始逐步加，手放急停旁边。
+2. **单关节先行**。从一个关节、``tau=0`` 开始逐步加，手放 Ctrl+C 上
+   （⛔ 本机无急停按钮，断电=自由落体，只能靠 Ctrl+C 进阻尼模式）。
 3. **看门狗生效**。:class:`~panthera.driver.safety.SafetyLayer` 必须在链路里。
 4. **确认限幅生效**：故意下发一个超限力矩，确认被截断而不是被执行。
 
@@ -41,8 +42,11 @@ class RealBackend(ArmBackend):
     """高擎 Panthera-HT 真机后端。
 
     Args:
-        sdk: 官方 ``Panthera`` 实例。传 ``None`` 时尝试导入官方包；
+        sdk: 官方 ``Panthera`` 实例。传 ``None`` 时**自己去找并实例化**官方 SDK
+            （见 :mod:`panthera.driver.sdk_path`，会自动处理
+            "``Panthera_lib`` 只能在 ``scripts/`` 目录导入" 这个坑）；
             传 :class:`FakePanthera` 可在无硬件时跑通整条链路。
+            ⚠️ 传 ``None`` 会**真的去开串口扫电机**——有副作用。
         dt: 标称控制周期。⚠️ **必须设成实测值**，见模块文档第 1 条。
         tau_limit: 力矩限幅。默认取官方示例里**最保守**的一套。
             ⚠️ 官方示例存在三套矛盾值，见 docs/给客服的问题清单.md Q9。
@@ -60,8 +64,12 @@ class RealBackend(ArmBackend):
     def __init__(self, sdk=None, dt: float = 0.005,
                  tau_limit=None, model=None):
         if sdk is None:                       # pragma: no cover - 需要硬件
-            from Panthera_lib import Panthera
-            sdk = Panthera()
+            from .sdk_path import follower_config, load_panthera_class
+            # ⚠️ 显式传绝对配置路径。不传的话 SDK 会用
+            #    `dirname(Panthera.py)/../../robot_param/Follower.yaml`，
+            #    虽然也能找到，但那是 SDK 内部实现细节，
+            #    显式写出来才能在日志里看到到底加载了哪一套（Leader/Follower 差别很大）。
+            sdk = load_panthera_class()(str(follower_config()))
         self.sdk = sdk
         self.n = int(sdk.motor_count)
         self.dt = float(dt)
