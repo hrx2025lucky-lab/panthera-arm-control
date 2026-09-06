@@ -464,6 +464,19 @@ class DLSInverseKinematics:
 
                         sigma0_pos  = 0.030707      sigma0_pose = 0.008869
 
+                    ⚠️⚠️ **上面两个是 Panda 的值，本类的默认值已换成 Panthera 的。**
+
+                    `实测` 在 Panthera 上按同样方法重标（mixed 分布、3000 样本、
+                    seed=7、q_center=Q_HOME、TCP=官方 tool_link 0.165 m）：
+
+                        sigma0_pos  = 0.032730  （Panda 的 1.07 倍）
+                        sigma0_pose = 0.004281  （Panda 的 **0.48 倍**）
+
+                    ⭐ 注意 pose 阈值差了一倍多。照搬 Panda 的 0.008869 会让
+                    阻尼**过早激活**——本来不奇异的构型被当成近奇异处理，
+                    白白损失精度。这正是 docstring 上面强调的
+                    "换机器人 / 换 TCP / 换任务类型都要重标"。
+
                     ⚠️ 这两个数不是"Panda 专属常数"那么简单。它们同时依赖：
                       机器人型号、**TCP 选取**（本项目取两指之间的抓取中心，
                       即法兰再往前 0.1029 m；换成法兰口径时 sigma0_pos 会从
@@ -504,8 +517,8 @@ class DLSInverseKinematics:
         robot: ArmModel,
         lam0: float = 0.05,
         method: str = "adaptive",
-        sigma0_pose: float = 0.008869,
-        sigma0_pos: float = 0.030707,
+        sigma0_pose: float = 0.004281,
+        sigma0_pos: float = 0.032730,
         char_length: float | None = None,
         rcond: float = 1e-6,
         null_gain: float = 0.0,
