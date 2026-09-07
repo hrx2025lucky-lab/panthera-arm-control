@@ -49,6 +49,65 @@ import mujoco
 from panthera.assets import panthera_xml
 
 
+def _make_full_mass_matrix():
+    """探测本机 ``mj_fullM`` 的真实签名，返回一个统一的 ``(model, data, dst)`` 调用器。
+
+    ⚠️⚠️ **这段代码存在的理由（改之前务必读完）**
+
+    MuJoCo 的 Python 绑定在不同版本里有**两种**互不兼容的签名：
+
+    ======================  =========================================
+    写法                     适用
+    ======================  =========================================
+    ``mj_fullM(m, dst, qM)`` 旧绑定，第三个参数是稀疏惯量数组 ``MjData.qM``
+    ``mj_fullM(m, d, dst)``  ⭐ 新绑定（本机 3.12），直接传 ``MjData``
+    ======================  =========================================
+
+    🔴 这个坑已经在本仓库里**来回改错三次**，原因有两个：
+
+    1. 用错签名时报的错是 ``AttributeError: 'MjData' object has no attribute 'qM'``。
+       它**看起来像**"参数顺序写反了"，于是下一个人就把顺序换过来——
+       结果换成另一种错法，来回拉锯。
+       （真实原因是 3.12 起 ``MjData.qM`` 已改名为 ``MjData.M``。）
+    2. 版本号 ``3.12.0`` 被读成了 "3.2"。⚠️ 版本号是**三段数字**不是小数，
+       ``3.12 > 3.2``。本机实测 ``mujoco.__version__ == '3.12.0'``。
+
+    ⇒ 所以这里**不硬编码任何一种**，而是在导入时真的各调一次，用能跑通的那个。
+    对应的守护测试见 ``panthera/tests/test_mass_matrix_binding.py``。
+    """
+    m = mujoco.MjModel.from_xml_string(
+        '<mujoco><worldbody><body><joint type="hinge"/>'
+        '<geom size=".1"/></body></worldbody></mujoco>')
+    d = mujoco.MjData(m)
+    mujoco.mj_forward(m, d)
+    dst = np.zeros((m.nv, m.nv))
+
+    try:                                   # 新绑定：mj_fullM(m, d, dst)
+        mujoco.mj_fullM(m, d, dst)
+        if dst[0, 0] > 0:
+            return lambda model, data, out: mujoco.mj_fullM(model, data, out)
+    except (TypeError, ValueError):
+        pass
+
+    try:                                   # 旧绑定：mj_fullM(m, dst, qM)
+        sparse = getattr(d, "qM", None)
+        if sparse is not None:
+            mujoco.mj_fullM(m, dst, sparse)
+            if dst[0, 0] > 0:
+                return lambda model, data, out: mujoco.mj_fullM(
+                    model, out, data.qM)
+    except (TypeError, ValueError, AttributeError):
+        pass
+
+    raise RuntimeError(
+        f"两种 mj_fullM 签名都调不通（mujoco {mujoco.__version__}）。"
+        "请检查绑定版本，不要靠改参数顺序试错。")
+
+
+#: 统一后的稠密质量矩阵调用器，签名恒为 ``(model, data, dst)``。
+_FULL_M = _make_full_mass_matrix()
+
+
 class ArmModel:
     """MuJoCo 机械臂的运动学/动力学查询接口。"""
 
@@ -252,7 +311,9 @@ class ArmModel:
         """
         d = self._at(q)
         full = np.zeros((self.model.nv, self.model.nv))
-        mujoco.mj_fullM(self.model, d, full)
+        # ⚠️ 不要把这行改成直接调 mujoco.mj_fullM——签名随版本变，
+        #    见 _make_full_mass_matrix 的说明（这个坑已来回改错三次）。
+        _FULL_M(self.model, d, full)
         return full[np.ix_(self.qvel_idx, self.qvel_idx)]
 
     def bias(self, q: np.ndarray | None = None, qd: np.ndarray | None = None) -> np.ndarray:
