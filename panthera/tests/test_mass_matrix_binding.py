@@ -101,15 +101,60 @@ class TestMassMatrixIsPhysicallyRight:
             robot.model.opt.enableflags &= ~flag
 
     def test_inertia_varies_with_posture(self, robot):
-        """⭐ M 必须**随姿态变**——这正是 CTC 存在的理由。
+        """⭐⭐ $M[0,0]$ 全域变 **37.5 倍** —— 这是 CTC 存在的理由，也是讲义反复引用的数。
 
-        ⚠️ 如果哪天它变成常数，说明取到的是常数块或者根本没更新构型，
-        那时 CTC 会退化成 PD 而没人发现。
+        ⚠️ **这个数曾经在四篇讲义里漂成四个值**（17 / 33 / 35.9 / 37 倍），
+        原因是各处用**随机采样**估极值，采样点不同结果就不同。
+        ⭐ 现已改用 L-BFGS-B 在限位内**求极值**，得到确定区间
+        ``0.015649 ~ 0.586390`` kg·m² $\\Rightarrow$ **37.47 倍**。
+
+        这条测试把它钉住：模型一旦改动使该比值明显偏离，就会红，
+        提醒去同步讲义里的数字。
+
+        ⚠️ 用宽区间 [30, 45] 而不是精确值——
+        判据要能容忍求解器的微小差异，但抓得住"数量级变了"这种真问题。
         """
-        m_folded = robot.mass_matrix(np.array([0., 0.1, 3.5, 0., 0., 0.]))[0, 0]
-        m_stretched = robot.mass_matrix(np.array([0., 1.57, 0.0, 0., 0., 0.]))[0, 0]
-        ratio = max(m_folded, m_stretched) / min(m_folded, m_stretched)
-        assert ratio > 3.0, f"J1 惯量随姿态只变了 {ratio:.2f} 倍，太小，可疑"
+        from scipy.optimize import minimize
+        bnds = list(zip(robot.q_lower[1:], robot.q_upper[1:]))
+
+        def m00(x, sign):
+            q = np.zeros(6)
+            q[1:] = x
+            return sign * robot.mass_matrix(q)[0, 0]
+
+        rng = np.random.default_rng(0)
+        lo, hi = np.inf, -np.inf
+        for _ in range(8):
+            x0 = rng.uniform(robot.q_lower[1:], robot.q_upper[1:])
+            lo = min(lo, minimize(m00, x0, args=(1.0,), bounds=bnds,
+                                  method="L-BFGS-B").fun)
+            hi = max(hi, -minimize(m00, x0, args=(-1.0,), bounds=bnds,
+                                   method="L-BFGS-B").fun)
+        ratio = hi / lo
+        assert 30.0 < ratio < 45.0, (
+            f"M[0,0] 姿态变化比 {ratio:.2f} 偏离已记录的 37.5 倍。"
+            f"区间 {lo:.6f}~{hi:.6f}。请同步 04/13/15/16 篇讲义里的数字。")
+
+    def test_last_joint_inertia_is_constant(self, robot):
+        """⭐⭐ J6 的自身惯量**完全不随姿态变**（`实测` 1.00 倍）。
+
+        这不是巧合，是结构决定的：
+        **一个关节的自身惯量只取决于它后面挂了多少东西**。
+        J6 是最后一个关节，后面什么都没有 $\\Rightarrow$ 不管前五个关节怎么摆，
+        它转动时要推的永远是同一坨（link6 自己）。
+
+        ⭐ 工程含义：**CTC 对 J6 完全没有必要**（固定增益 PD 就够），
+        而对 J1（变 37.5 倍）极其必要。
+        ⚠️ J6 真正的麻烦是转子惯量占 97.3%，那是另一个问题。
+        """
+        rng = np.random.default_rng(3)
+        vals = [robot.mass_matrix(rng.uniform(robot.q_lower, robot.q_upper))[5, 5]
+                for _ in range(50)]
+        vals = np.array(vals)
+        spread = float(np.ptp(vals))   # ⚠️ NumPy 2.0 起 ndarray.ptp() 已移除
+        assert spread < 1e-12, (
+            f"J6 自身惯量应恒定，实测波动 {spread:.3e}。"
+            "若变了，说明模型拓扑或末端负载改了")
 
 
 class TestBindingProbe:
