@@ -9,7 +9,7 @@
 | 七障碍环境中的完整抓放 | 腕部视觉驱动的抓放 |
 |---|---|
 | [![七障碍抓放演示](docs/media/panthera_tall_poster.png)](docs/media/panthera_tall_zh.mp4) | [![腕部视觉抓放演示](docs/media/panthera_visual_execution_poster.png)](docs/media/panthera_visual_execution_zh.mp4) |
-| **[观看视频 · 42.98 秒](docs/media/panthera_tall_zh.mp4)** | **[观看视频 · 41.10 秒](docs/media/panthera_visual_execution_zh.mp4)** |
+| **[完整视频文件 · 42.98 秒](docs/media/panthera_tall_zh.mp4)** | **[完整视频文件 · 41.10 秒](docs/media/panthera_visual_execution_zh.mp4)** |
 | 空手接近与携物搬运均经过绕障规划 | 仿真 RGB-D 定位后生成抓取与放置目标 |
 
 两段视频均为中文、1080p、50 FPS，以原始仿真状态重建全臂、夹持特写和腕部视角，保留接近、夹持、搬运、释放与撤离全过程。腕部相机是仿真中的眼在手上视角。视觉视频选自声明批次中的成功案例，批次结果为 1/2，具体条件见报告。
@@ -59,5 +59,3 @@ flowchart LR
 源码入口：[运动学](panthera/core/kinematics.py) · [动力学接口](panthera/core/robot.py) · [CTC](panthera/control/computed_torque.py) · [笛卡尔阻抗](panthera/control/impedance.py) · [动量观测器](panthera/control/momentum_observer.py) · [轨迹生成](panthera/planning/trajectory.py)。报告中的数值对应 [results.json](docs/results.json) 记录的实验版本与配置。
 
 机器人几何资源来自 [HighTorque Robotics Panthera-HT ROS2](https://github.com/HighTorque-Robotics/Panthera-HT_ROS2)，物理求解使用 [MuJoCo](https://github.com/google-deepmind/mujoco)。项目代码许可见 [LICENSE](LICENSE)；第三方资源遵循各自的来源与许可声明。
-
-相关项目：[FlyArm 空中操作](https://github.com/hrx2025lucky-lab/flyarm-aerial-manipulation) · [G1 全身运动](https://github.com/hrx2025lucky-lab/humanoid-g1-locomotion)
