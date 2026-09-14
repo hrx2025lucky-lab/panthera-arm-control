@@ -309,6 +309,55 @@
       "file": "docs/media/tall_paths_zh.png",
       "sha256": "9fb4d8569f7b3ee4cc5ee94c32cd129a3913525e142ccb87218ff2eae4e7f861",
       "bytes": 413269
+    },
+    {
+      "file": "docs/media/grid100_dynamic.png",
+      "sha256": "50b44f566a6358e1cb4f3975d7ca47ccc6e5b33b8d591a6e4c543f3391535412",
+      "bytes": 153308
+    },
+    {
+      "file": "docs/media/panthera_tall_preview.gif",
+      "sha256": "5194d1a3d49800a45414593f0708ea9768b8589e07cfbfedfeda776e9d74e0df",
+      "bytes": 9217907,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 768,
+            "height": 432,
+            "r_frame_rate": "20/1",
+            "nb_frames": "860"
+          }
+        ],
+        "format": {
+          "duration": "43.000000"
+        }
+      },
+      "kind": "complete_task_looping_gif_preview",
+      "source": "docs/media/panthera_tall_zh.mp4",
+      "new_physics_steps": 0
+    },
+    {
+      "file": "docs/media/panthera_visual_preview.gif",
+      "sha256": "54a73c7285c752d4e325461fe7342d65abbe1496813f7f90aa6a2f3700e9cbfa",
+      "bytes": 7953875,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "width": 768,
+            "height": 432,
+            "r_frame_rate": "20/1",
+            "nb_frames": "822"
+          }
+        ],
+        "format": {
+          "duration": "41.100000"
+        }
+      },
+      "kind": "complete_task_looping_gif_preview",
+      "source": "docs/media/panthera_visual_execution_zh.mp4",
+      "new_physics_steps": 0
     }
   ],
   "learning": {
@@ -360,5 +409,20 @@
       },
       "scope": "Equal task completion across all three groups does not establish a learning benefit."
     }
+  },
+  "interactive_curves": {
+    "file": "docs/showcase-data.js",
+    "sha256": "b7f03afdf035d0c14a215a5889841e94a53e65f162dbd949a7e43fddf0fd7e07",
+    "source": {
+      "record_id": "control_benchmark/2026-09-09_current",
+      "samples_sha256": "cad96cad6e7a4a645b9b1de2bd06d37e39089ab52991a620d3a6973de87793a2",
+      "summary_sha256": "f6808e422d349fd5d0e2d48039d81e091012af51eb08fea0deb9db1662f42598",
+      "repeat": 1,
+      "sample_stride": 10,
+      "physical_step_s": 0.002,
+      "plotted_values": "Original samples, without smoothing; include the last original point."
+    },
+    "sampled_tracking_points": 201,
+    "sampled_impedance_points": 301
   }
 }
