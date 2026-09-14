@@ -24,6 +24,8 @@ SOFTWARE.
 
 第三方资产说明
 --------------
-本仓库**不包含**机器人模型文件。运行时依赖的 Franka Panda 模型来自
-mujoco_menagerie（https://github.com/google-deepmind/mujoco_menagerie），
-由 Google DeepMind 以 Apache-2.0 许可发布，需自行获取，见 README。
+本仓库 models/panthera/ 中的 Panthera 机器人模型与网格源自
+HighTorque Robotics 的 Panthera-HT_ROS2，并包含项目转换与修改：
+https://github.com/HighTorque-Robotics/Panthera-HT_ROS2
+仿真图片和视频使用该机器人几何。第三方资产遵循各自上游许可声明；
+本项目的 MIT 许可不替代第三方资产或依赖的许可。

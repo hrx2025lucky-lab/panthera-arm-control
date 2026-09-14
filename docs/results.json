@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "scope": "Frozen MuJoCo experiment results and media provenance. Metrics apply to the recorded model, reference, gains and evaluation protocol; not real-robot results.",
+  "runtime_mode": "mujoco_only",
+  "hardware_write_enabled": false,
+  "control": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "f6808e422d349fd5d0e2d48039d81e091012af51eb08fea0deb9db1662f42598",
+      "bytes": 31809,
+      "record_id": "control_benchmark/2026-09-09_current"
+    },
+    "configuration": {
+      "seed": 20260908,
+      "repeats": 3,
+      "joint_tracking": {
+        "q0_rad": [
+          0.0,
+          0.7,
+          0.7,
+          -0.1,
+          0.0,
+          0.0
+        ],
+        "amplitude_rad": [
+          0.3,
+          0.2,
+          0.3,
+          0.2,
+          0.3,
+          0.3
+        ],
+        "frequency_hz": 0.5,
+        "duration_s": 4.0,
+        "warmup_s": 1.0,
+        "smooth_start_ramp_s": 1.0,
+        "pd_kp": 20.0,
+        "pd_kd": 8.0,
+        "ctc_wn_rad_s": 30.0,
+        "ctc_zeta": 1.0
+      },
+      "impedance_f_over_k": {
+        "q0_rad": [
+          0.0,
+          0.7,
+          0.7,
+          -0.1,
+          0.0,
+          0.0
+        ],
+        "k_trans_n_m": 500.0,
+        "k_rot_nm_rad": 1.2,
+        "zeta": 1.0,
+        "damping_design": "fixed",
+        "force_z_n": -10.0,
+        "force_start_s": 0.5,
+        "force_end_s": 4.5,
+        "steady_window_s": [
+          3.5,
+          4.5
+        ],
+        "duration_s": 6.0,
+        "external_force_path": "mujoco.mj_applyFT at TCP"
+      }
+    },
+    "model": {
+      "path": "models/panthera/panthera.xml",
+      "sha256": "e43084e0b2a9579c301e13c39d024bde299fa9074e38c7a8611c2799affc90b4"
+    },
+    "source_fingerprints": {
+      "benchmark_runner": {
+        "path": "panthera/demos/control_benchmark.py",
+        "sha256": "6aba1b5b61f9af12a8cc99f8810f6c9b930044921e8ce61890302368702b4e14"
+      },
+      "computed_torque": {
+        "path": "panthera/control/computed_torque.py",
+        "sha256": "3578a12bff0c505de5d652da8e8cf591aa62ef60fd2b53726ffb9664c5e69ef5"
+      },
+      "cartesian_impedance": {
+        "path": "panthera/control/impedance.py",
+        "sha256": "53257b332afc9cd5cd86aee42c8a81de48bf0402f518088ad4e5cdcf3975e52f"
+      },
+      "pd_rollout_baseline": {
+        "path": "panthera/sim/rollout.py",
+        "sha256": "e0fe65761ca49152ffec7378fc1649e36c7947c08d5419aed47550d1a005c639"
+      },
+      "robot_model_api": {
+        "path": "panthera/core/robot.py",
+        "sha256": "8dcf8f1304d919ef9d522c0557ccb86268a3ec35b3865afe9762d46e5420d655"
+      },
+      "mujoco_backend": {
+        "path": "panthera/driver/mujoco_backend.py",
+        "sha256": "b0c7251dbc7b7d4aa0f419bad34d5bfba372aafc45add8eec76001542ea55e43"
+      },
+      "kinematics": {
+        "path": "panthera/core/kinematics.py",
+        "sha256": "342ad29e36a56f3003b890c241817c5abdd4b41aa478dfe674c45b8fd6211cdb"
+      },
+      "asset_resolver": {
+        "path": "panthera/assets.py",
+        "sha256": "9e6ee235d170ad4fe1440f3808d0f358785f913bc123a4cf25535f60707f4f29"
+      }
+    },
+    "joint_rmse_mrad": {
+      "pd_gravity": 7.191321551404324,
+      "computed_torque": 4.731385327366229
+    },
+    "impedance_f_over_k_relative_error_pct": 1.584208383095583,
+    "scope": "descriptive results for this fixed MuJoCo model and configuration; not a universal controller ranking and not real-robot evidence"
+  },
+  "adaptive": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "1a6b973dc1edc326902319f9d43fac025db52d460deb6d2704f9d02aebd3c9d1",
+      "bytes": 39901,
+      "record_id": "payload_adaptive/2026-09-11_formal_v1"
+    },
+    "physics_steps": 216000,
+    "runs": 36,
+    "comparisons": [
+      {
+        "plant_mass_kg": 0.0,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 0.07134174993268051,
+          "adaptive": 0.07127515729905176,
+          "known_mass_oracle": 0.07134174993268051
+        },
+        "adaptive_reduction_pct": 0.09334314576189273
+      },
+      {
+        "plant_mass_kg": 0.0,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 0.06420299491847106,
+          "adaptive": 0.0643321156602796,
+          "known_mass_oracle": 0.06420299491847106
+        },
+        "adaptive_reduction_pct": -0.20111326889424852
+      },
+      {
+        "plant_mass_kg": 0.062,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 2.5466853096414632,
+          "adaptive": 0.09617985642118684,
+          "known_mass_oracle": 0.07147968741483636
+        },
+        "adaptive_reduction_pct": 96.22333171448155
+      },
+      {
+        "plant_mass_kg": 0.062,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 2.5509456358163125,
+          "adaptive": 0.08953463998604554,
+          "known_mass_oracle": 0.06415375675246969
+        },
+        "adaptive_reduction_pct": 96.49013923586051
+      },
+      {
+        "plant_mass_kg": 0.124,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 5.08747705575283,
+          "adaptive": 0.14449964651513952,
+          "known_mass_oracle": 0.07163992044026729
+        },
+        "adaptive_reduction_pct": 97.1596992982653
+      },
+      {
+        "plant_mass_kg": 0.124,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 5.098621788155484,
+          "adaptive": 0.14000436917084735,
+          "known_mass_oracle": 0.06408936274175787
+        },
+        "adaptive_reduction_pct": 97.25407423833458
+      }
+    ],
+    "scope": "Single payload mass is adapted; payload COM and unit-mass inertia are known. Same feedback and reference across paired controllers; not full inertial identification."
+  },
+  "tall_obstacles": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "7b19d6b61b5348615b8dd52cc889909d585f8f9b35b4bf2da745c8360b46d427",
+      "bytes": 819,
+      "record_id": "tall_obstacles/2026-09-11_formal_v1"
+    },
+    "results": [
+      {
+        "case": "seed_30",
+        "seed": 30,
+        "task_pass": true,
+        "planning_pass": true,
+        "physics_steps": 21481,
+        "report_sha256": "7f558d66555508d713d2016bd13cdc88fd50964fe31f696b5ab016d8768df724"
+      },
+      {
+        "case": "seed_31",
+        "seed": 31,
+        "task_pass": true,
+        "planning_pass": true,
+        "physics_steps": 32438,
+        "report_sha256": "194a6352817a4e0aecd9d1681c111c6204c203346f9bf091493fbbf791ddb578"
+      },
+      {
+        "case": "blocked_goal",
+        "negative_pass": true,
+        "physics_steps": 0,
+        "report_sha256": "cae49a11bc14564d5debc253cbd2b843d72964d62b3674d540d965c3c6af830a"
+      }
+    ],
+    "physics_steps": 53919,
+    "scope": "One fixed seven-obstacle scene, 14-21 cm tall, two predeclared planner seeds, 6 mm query margin."
+  },
+  "visual_execution": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "589d159fbfb18c73b714ed58e6cf252f4de15ea9569b521ce4a11d922ea57173",
+      "bytes": 19619,
+      "record_id": "visual_execution/2026-09-11_observe_v2"
+    },
+    "successful_tasks": 1,
+    "declared_tasks": 2,
+    "expected_refusals": 4,
+    "declared_fault_cases": 4,
+    "physics_steps": 20543,
+    "qualification_pass": false,
+    "scope": "Known marker geometry, simulated RGB-D, same-exposure robot pose, known obstacle map, fixed observation pose; no real D405 or continuous visual-servo claim."
+  },
+  "grid": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "30bc25f49b6b4bceeaf1198be1ab0fb7a94bc5a5123144c36f0dbce5f2dcd3ab",
+      "bytes": 7975,
+      "record_id": "pick_place_grid/2026-09-09_grid100_report"
+    },
+    "cases": 100,
+    "successful_tasks": 100,
+    "physics_steps": 1793308,
+    "scope": "Deterministic 10x10 position grid, nominal model, known object poses; one execution per case. No random generalization, vision, learning or real-robot claim."
+  },
+  "media": [
+    {
+      "file": "docs/media/panthera_tall_zh.mp4",
+      "sha256": "f91345a8e1bc2b52284b030280803a63bb21d692a0ce4907d7eeae14a37c8a75",
+      "bytes": 6300708,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "50/1",
+            "nb_frames": "2149"
+          }
+        ],
+        "format": {
+          "duration": "42.980000",
+          "size": "6300708"
+        }
+      }
+    },
+    {
+      "file": "docs/media/panthera_tall_poster.png",
+      "sha256": "2ddc79ab48f23fe84c0006ba0b82245c9e3972a329411286809119574b502835",
+      "bytes": 205256
+    },
+    {
+      "file": "docs/media/panthera_visual_execution_zh.mp4",
+      "sha256": "74b7d13178ff99c99936b0fc969cadf44d08afaeea78482e6bd461b3ed17f241",
+      "bytes": 6123723,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "50/1",
+            "nb_frames": "2055"
+          }
+        ],
+        "format": {
+          "duration": "41.100000",
+          "size": "6123723"
+        }
+      }
+    },
+    {
+      "file": "docs/media/panthera_visual_execution_poster.png",
+      "sha256": "4e1465048a63deb754720be1c4f8d76083f92fdbe3748919f4b521311cefe27a",
+      "bytes": 260051
+    },
+    {
+      "file": "docs/media/control_comparison.png",
+      "sha256": "e32d37804834b5f8c760c61f9019ca3c004ebc29828ed8f0c6b7b602e0342944",
+      "bytes": 136041
+    },
+    {
+      "file": "docs/media/payload_adaptive_comparison.png",
+      "sha256": "281fed281d67b7c177b699a4a2dfe05cd5c3fe6d46385f2fab3baa084080974b",
+      "bytes": 208487
+    },
+    {
+      "file": "docs/media/tall_paths_zh.png",
+      "sha256": "9fb4d8569f7b3ee4cc5ee94c32cd129a3913525e142ccb87218ff2eae4e7f861",
+      "bytes": 413269
+    }
+  ],
+  "learning": {
+    "act": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_act/2026-09-11_rollout_v1",
+        "sha256": "090f51f41fbe7ee761fc336953e245478ac203d8f3e91b2fb7021742780a41fb",
+        "bytes": 13618
+      },
+      "observation": "simulation state; no image encoder",
+      "declared_tasks": 2,
+      "successful_tasks": 0,
+      "physics_steps": 22695
+    },
+    "diffusion_policy": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_diffusion/2026-09-11_rollout_v1",
+        "sha256": "12445d9fd640e3e92c84e379be9b0313a8e3a30feb3d4703c35c123d9cd20a15",
+        "bytes": 13820
+      },
+      "observation": "simulation state; no image encoder",
+      "declared_tasks": 2,
+      "successful_tasks": 0,
+      "physics_steps": 50000
+    },
+    "ppo": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_ppo/2026-09-11_train_v2",
+        "sha256": "85229ca6fdff0ebe0160b1d06e8f5a316fded9a66710888244871954d08545aa",
+        "bytes": 41452
+      },
+      "observation": "simulation state and scripted reference",
+      "comparisons": {
+        "zero_residual_reused": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        },
+        "untrained": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        },
+        "trained": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        }
+      },
+      "scope": "Equal task completion across all three groups does not establish a learning benefit."
+    }
+  }
+}

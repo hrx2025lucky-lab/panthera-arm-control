@@ -1,310 +1,63 @@
-# panthera-arm-control
+# Panthera-HT 机械臂控制与抓放仿真
 
-高擎 **Panthera-HT** 六轴机械臂的力矩级控制栈，面向**真机部署**与**参数辨识驱动的 sim2real**。
+以 Panthera 六轴机械臂和双指夹爪为对象，将**机器人建模、运动控制、运动规划与接触操作**连接成 MuJoCo 仿真闭环。项目用同条件控制对照和完整抓放任务，评价跟踪误差、柔顺响应、负载适应与避障执行。
 
-> 本项目是 [`armctrl`](https://github.com/roxan-limx/armctrl) 的真机分支。
-> armctrl 用 Franka Panda 在 MuJoCo 里验证算法，结论至多到「**同模型自洽**」；
-> 这里换成有真机可跑的 Panthera-HT，目标是把那一档推到「**已在真机验证**」。
+[项目总结与实验报告](docs/project_summary.md) · [实验结果与媒体指纹](docs/results.json)
 
----
+## 视频演示
 
-## 为什么单开一个仓库
-
-armctrl 的 734 项测试和十几篇讲义里，大量实测数字是 **Panda 专属**的
-（雅可比 0.4840、可辨识秩 62、7 自由度零空间、接触力分解那四个数……）。
-直接把模型换掉，等于把几轮独立审核攒下来的验证结果**一次性作废**。
-
-所以两边并存：**armctrl 保持仿真侧的完整验证资产，本仓库负责真机**。
-
----
-
-## 与 armctrl 的三个关键差异
-
-| | armctrl（Panda） | 本项目（Panthera-HT） |
-|---|---|---|
-| 自由度 | 7 ⇒ **有冗余**，零空间维度 1 | **6 ⇒ 零冗余**，零空间维度恒为 0 |
-| 力矩限幅 | 仿真，放开到 ±1e6 无所谓 | ⚠️ **代码原样下发真机，限幅是安全闸，不许放开** |
-| 模型来源 | `mujoco_menagerie`（第三方标定模型） | 官方 URDF（**CAD 导出**）+ 本仓库补齐传动参数 |
-
-### ⚠️ 6 轴没有零空间
-
-`impedance.py` 里保留了零空间项，但在本项目中它**恒等于零向量**。
-保留是为了与 armctrl 逐行对照、以及将来挂冗余臂时能自然生效。
-
-⭐ **不要因为「跑通了」就认为零空间在起作用**——想验证请断言投影矩阵的秩
-（`test_model.py::test_no_redundancy` 就是干这个的）。
-
----
-
-## ⚠️⚠️ 模型里有占位参数，用之前必读
-
-官方 `panthera_ht_ros_description.urdf` 是 **CAD 导出**的。
-连杆几何与连杆惯量可信，但缺三样**落到真机一定存在、而 CAD 给不出**的东西：
-
-| 缺什么 | 现状 | 为什么 CAD 给不出 |
-|---|---|---|
-| **执行器** | ✅ 转换脚本已补 | URDF 本来就不描述执行器，原始模型 `nu=0` |
-| **转子反射惯量** `armature` | ⚠️ **占位值** | 它是**传动系统**属性，不是连杆几何属性 |
-| **关节摩擦** `damping`/`frictionloss` | ⚠️ **占位值** | 同上，几何模型里不存在摩擦 |
-
-**转子惯量为什么不能忽略**：减速比 $N=36$ ⇒ 反射惯量放大 $N^2 = 1296$ 倍。
-典型转子 `1e-5 kg·m²` 反射后是 **0.013**，而 link2 的 `izz` 只有 **0.0227**——**同一量级**。
-
-占位值取自官方 SDK 示例注释里的「建议初始值」，原文写明
-**「需要根据实际机器人进行辨识和调整」**。
-（一个旁证：示例里 J2 和 J3 给了完全相同的一组数，而两者负载差很多。）
-
-> ⛔ **不辨识就直接训 RL，等于在一个没有摩擦的世界里训练**，策略上真机必然发涩。
-> 辨识流程见 [`docs/参数辨识与sim2real.md`](docs/参数辨识与sim2real.md)。
-
----
-
-## 快速开始
-
-```bash
-pip install mujoco numpy
-PYTHONPATH=. python -m unittest discover panthera/tests
-```
-
-```python
-from panthera.core.robot import make_panthera, Q_HOME
-
-robot = make_panthera()
-print(robot.n)                  # 6
-print(robot.tau_limit)          # [10. 20. 20. 10.  5.  5.]
-print(robot.gravity(Q_HOME))    # [0. 0.379 4.216 1.039 0. 0.]
-```
-
-### 重新生成模型
-
-模型随仓库分发，正常不需要重生成。需要时：
-
-```bash
-git clone https://github.com/HighTorque-Robotics/Panthera-HT_ROS2.git
-python tools/urdf_to_mjcf.py \
-    --urdf   Panthera-HT_ROS2/src/panthera_ht_ros_description/urdf/panthera_ht_ros_description.urdf \
-    --meshes Panthera-HT_ROS2/src/panthera_ht_ros_description/meshes \
-    --out    models/panthera
-```
-
----
-
-## 统一后端：同一份控制代码，仿真与真机都能跑
-
-```python
-from panthera.driver.mujoco_backend import MujocoBackend
-from panthera.core.robot import Q_HOME
-
-with MujocoBackend() as be:          # 换成 RealBackend() 即上真机，控制代码不动
-    be.reset(Q_HOME)
-    for _ in range(1500):
-        s = be.read()
-        be.send_torque(be.gravity(s.q))
-        be.step()
-```
-
-⭐ **为什么要这一层**：如果仿真和真机的接口不同，会出现最难查的一类错误——
-控制器搬到真机上因为**接口语义差一点**而行为不同，而你会以为那是 sim2real gap。
-判据就脏了。
-
-⚠️ `RealBackend` 目前是骨架。接入前必须先做四件事（见 `driver/mujoco_backend.py`
-的 docstring）：实测控制频率、单关节先行、看门狗、验证限幅生效。
-
----
-
-## ⭐ 最终目标：系统辨识 vs 域随机化的定量对照
-
-这个项目不止是「把算法搬到真机上」。真正的目标是回答一个问题：
-
-> **面对同一个 sim2real gap，模型法（把模型做准）和学习法（让策略鲁棒）
-> 各自表现如何？**
-
-|  | CAD 模型（摩擦=0、armature=0） | 辨识后模型 |
-|---|---|---|
-| **传统控制**（CTC / 阻抗） | A | B |
-| **RL + 域随机化** | C | D |
-
-⭐ **关键论点**：「RL 不需要精确模型」只对了一半。准确说是
-**不需要精确的点估计，但需要合理的分布**——而辨识给的正是分布的中心与方差。
-不辨识就只能把随机化范围拍得很宽，代价是**策略保守、性能下降**。
-
-详见 [`docs/辨识与域随机化对照实验.md`](docs/辨识与域随机化对照实验.md)（实验设计）
-与 [`docs/RL_sim2real流程.md`](docs/RL_sim2real流程.md)（八步流程、任务定义、部署架构）。
-
----
-
-## sim2real 流程
-
-```
-辨识参数 ──→ 同步进 IsaacLab(USD) 与 MuJoCo(MJCF)
-                  │                    │
-            训练(PPO, 数千并行)          │
-                  │                    │
-               策略 ──── sim2sim 验证 ──┘   ← ⭐ 独立引擎交叉检验
-                  │
-                真机部署
-```
-
-⭐ 中间那步是**两个物理引擎的独立实现**（PhysX vs MuJoCo 求解器）在互验：
-策略在 A 能跑、到 B 就废 ⇒ 它过拟合了 A 的数值特性，而不是学到了物理。
-
-⚠️ **前提是两边模型一致**——`armature` 最容易在 URDF→USD 转换里丢掉。
-丢了以后 sim2sim 对不上，你会以为是「引擎差异」，实际是「模型没对齐」。
-所以有 [`tests/test_model_parity.py`](panthera/tests/test_model_parity.py)：
-导出**物理指纹**（质量 / armature / 摩擦 / 限幅 / 减速比），在 Isaac 侧也导一遍逐项 diff。
-
-```bash
-PYTHONPATH=. python -m panthera.tests.test_model_parity   # 打印物理指纹
-```
-
----
-
-## 调参台
-
-```bash
-PYTHONPATH=. python -m panthera.tuner impedance
-# 浏览器打开 http://127.0.0.1:8770/
-```
-
-四个场景（armctrl 那 12 个是**教学**用的，这四个是**真机对照**用的）：
-
-| 场景 | 拖什么 | ⭐ 该看到什么 |
-|---|---|---|
-| `gravity` | 补偿比例 η | η=1 停住不动；η=0.5 明显下沉 |
-| `impedance` | 刚度 K | **稳态偏移精确等于 F/K**（判据独立于实现） |
-| `tracking` | 控制律、周期 T | CTC 优于 PD，**且优势随速度扩大** |
-| `identify` | 谐波数、幅值 | ⭐ **条件数随激励质量变化**（armctrl 没有这个场景） |
-
-### ⚠️ 迁移时踩到的三个坑（都是「指标测错了对象」）
-
-| 坑 | 现象 | 根因 |
-|---|---|---|
-| CTC 优势偏小 | 只比 PD 好 13% | 漏了 $\dot J\dot q$ 项（ẍ = J q̈ + **J̇q̇**） |
-| RMS 被瞬态淹没 | 稳态差异看不出 | 参考轨迹 t=0 处速度非零而手臂静止 |
-| ⭐ **条件数恒为 10¹⁸** | **调什么都不变** | 没投影到基参数子空间 |
-
-第三条最典型：完整参数集 78 维里有 **26 维结构性不可辨识**，
-直接算条件数得到的是「结构性病态」，与激励好坏无关。
-投影到基参数（**Panthera rank = 52**）之后，它才真正随激励变化。
-
-> ⭐ **一个永远不变的指标，比没有指标更危险**——它让你以为自己在监控。
-
-⚠️ 修完之后做了变异验证，发现前两个坑的测试**照样全绿**——
-因为当时用的是**代理量**（RMS 比值）。改成直接暴露 `‖J̇q̇‖` 和 `n_rms`
-两个读数后才抓住。这正是「判据必须直接测你要的那个物理量」。
-
----
-
-## 目录
-
-```
-panthera/
-├── core/            运动学、雅可比、动力学（M, C, g, Λ）
-├── control/         阻抗、CTC、Slotine-Li 自适应、动量观测器
-│   │                （⚠️ 阻抗的零空间项在 6 轴上恒为零）
-│   ├── computed_torque.py  关节/任务空间 CTC（⚠️ 含 J̇q̇ 项）
-│   ├── adaptive.py         自适应（⚠️ 默认归一化律 + 按力矩容量缩放增益）
-│   └── momentum_observer.py 无传感器外力估计 + 拖动示教
-├── identification/  回归矩阵 τ = Y(q,q̇,q̈)π、基参数、离线最小二乘
-│   ├── regressor.py    回归矩阵 + 基参数投影（78 → 52）
-│   ├── excitation.py   ⭐ 傅里叶激励轨迹 + 条件数优化
-│   ├── pipeline.py     采样 → 求解 → 三个独立判据
-│   └── offline_ls.py   增量 QR（⚠️ 不构造 WᵀW）
-├── driver/          统一后端：backend.py(接口) + mujoco_backend.py
-│                   ⚠️ RealBackend 待接入 hightorque_robot
-├── demos/           identify_demo.py：三条轨迹对照
-└── tests/           冒烟测试 + 守护测试（51 项）
-models/panthera/     MJCF + 网格（由 tools/urdf_to_mjcf.py 生成）
-tools/               URDF → MJCF 转换
-docs/                参数辨识与 sim2real 方案、新对话交接 prompt
-```
-
----
-
-## ⭐ 辨识：训练集残差**不能**当判据
-
-三条轨迹，力矩噪声都是 0.02 N·m，`实测`：
-
-| 轨迹 | log₁₀κ | β 误差 | **训练残差** | 留出残差 |
-|---|---|---|---|---|
-| A 单关节慢摆 | 19.11 | **49.9%** | **0.046%** ← 最小 | 8.894% |
-| B 随机傅里叶 | 2.42 | 1.489% | 0.058% | 0.112% |
-| C 优化后 | **2.10** | **0.696%** | 0.065% ← 最大 | **0.068%** |
-
-**参数错了 50% 的那条，训练残差反而最小**——因为它几乎不动，
-力矩又小又单调，随便什么参数都拟合得很好。三条的训练残差全落在
-0.046%–0.065% 这个窄带里，**根本没有分辨力**，却又不为零、看起来很专业。
-
-能抓住 A 的只有两个判据：**log₁₀κ**（事前，不用采数据）
-和**留出残差**（事后，把 A 和 C 拉开 130 倍）。
-
-> ⚠️ 真机上没有 β 误差（不知道真值）。所以真机流程必须是
-> **事前看 κ + 事后看留出残差**。
-
-复现：`PYTHONPATH=. python -m panthera.demos.identify_demo`
-详见 [`docs/激励轨迹与参数辨识.md`](docs/激励轨迹与参数辨识.md)。
-
----
-
-## ⭐⭐ 闭环测试抓到的：51 项测试全绿，模型里躺着致命 bug
-
-底座与 link1 的碰撞网格永久穿模 2.3 mm，接触摩擦把 **J1 完全锁死**——
-施加 5 N·m 一秒钟只转了 0.0001 rad。
-
-51 项测试没有一项发现它：它们验的是运动学、动力学、回归矩阵、条件数，
-**没有一项触碰接触求解器，没有一项把回路闭起来**。
-
-`实测` 修复后同一组增益的跟踪 RMS 从 **0.087 降到 0.006（14 倍）**。
-在此之前所有 PD vs CTC 的对比数字全部无效。
-
-> 根因：MuJoCo 默认过滤父子刚体碰撞，**但这条规则对 world 不适用**。
-
-同一轮还抓到三个只有闭环才暴露的问题：
-
-| 问题 | 现象 |
+| 七障碍环境中的完整抓放 | 腕部视觉驱动的抓放 |
 |---|---|
-| `reset` 不清速度 | 同一组增益因执行顺序读出 4.86 或 15.88 N·m |
-| 标量 $K_D$ | 腕部（5 N·m）饱和 79%/89%，肩肘（20 N·m）0% |
-| 一个"3.44×"的假结果 | 重跑变成 1.01×——系统在发散，轨迹是混沌的 |
+| [![七障碍抓放演示](docs/media/panthera_tall_poster.png)](docs/media/panthera_tall_zh.mp4) | [![腕部视觉抓放演示](docs/media/panthera_visual_execution_poster.png)](docs/media/panthera_visual_execution_zh.mp4) |
+| **[观看视频 · 42.98 秒](docs/media/panthera_tall_zh.mp4)** | **[观看视频 · 41.10 秒](docs/media/panthera_visual_execution_zh.mp4)** |
+| 空手接近与携物搬运均经过绕障规划 | 仿真 RGB-D 定位后生成抓取与放置目标 |
 
-⭐ **一个会因 1e-16 扰动而翻转的结论不是结论。** 发现它只需要把同一个实验做两遍。
+两段视频均为中文、1080p、50 FPS，以原始仿真状态重建全臂、夹持特写和腕部视角，保留接近、夹持、搬运、释放与撤离全过程。腕部相机是仿真中的眼在手上视角。视觉视频选自声明批次中的成功案例，批次结果为 1/2，具体条件见报告。
 
-公平对比（力矩预算相当，均不饱和）：
+## 代表性结果
 
-| 控制器 | RMS | \|τ\|max | 饱和 |
-|---|---|---|---|
-| PD + 重力补偿 kp=20 | 0.00614 | 11.80 | 0% |
-| **CTC wn=30** | **0.00492** | 11.99 | 0% |
-| PD kp=100 | 0.01536 ← 变差 | 20.00 | 26.6% |
-| CTC wn=45 | **0.00223** | 15.88 | 0% |
-
-详见 [`docs/闭环控制与观测器.md`](docs/闭环控制与观测器.md)。
-
----
-
-## 硬件
-
-| | |
-|---|---|
-| 型号 | 高擎 Panthera-HT 六轴 |
-| 负载 / 臂展 / 自重 | 3.5 kg / 860 mm / 4.35 kg |
-| 减速比 | J1–J4：**36**；J5–J6：**30** |
-| 额定 / 堵转扭矩 | 6–10 N·m / 21–36 N·m |
-| 通信 | CAN 1 Mbps，**CAN FD 5 Mbps** |
-| 模组控制频率 | 3 kHz |
-| 官方 SDK | [`Panthera-HT_SDK`](https://github.com/HighTorque-Robotics/Panthera-HT_SDK)（MIT） |
-| 控制协议 | **MIT 模式**（源自 MIT Mini Cheetah）：一帧下发 pos / vel / kp / kd / τ_ff，<br>电机内部按 τ = kp·Δq + kd·Δq̇ + τ_ff 以 3 kHz 执行。<br>⭐ kp=kd=0 即纯力矩（CTC 走这个）；kp 大即位置控制（RL 走这个）。<br>详见 [`docs/RL_sim2real流程.md`](docs/RL_sim2real流程.md) §零 |
-
-⚠️ **力矩限幅有三个来源，别混**：
-
-| 来源 | 值 | 含义 |
+| 实验 | 结果 | 条件 |
 |---|---|---|
-| URDF `<limit effort>` | 21/36/36/21/10/10 | 参数手册的**堵转扭矩** |
-| 参数手册额定 | 6/10/10/6/6/6 | 可**长期连续**输出 |
-| ⭐ SDK 示例 `tau_limit` | **10/20/20/10/5/5** | 官方工程限幅，**本项目取这个** |
+| PD+g 与计算力矩 CTC | 关节 RMSE **7.191 / 4.731 mrad** | 相同模型、参考轨迹和力矩限制 |
+| 笛卡尔阻抗 | 静态 F/K 相对误差 **1.584%** | 固定姿态、方向与外力 |
+| 负载质量自适应 | **36 次对照、216,000 个物理步**；62/124 g 负载下 RMSE 相对冻结估计降低 **96.22%–97.25%** | 单质量在线更新；已知质心与单位质量惯量 |
+| 七障碍绕行抓放 | **两个预设规划种子均完成任务** | 固定布局，障碍高度 14–21 cm；整机、双指与携物碰撞检查 |
+| 批量接触抓放 | **100/100** 完整任务 | 确定性 10×10 位置网格、名义模型、已知物体位姿 |
 
----
+以上均为各自固定条件下的仿真结果。不同实验的指标分别评价，不表示真机精度、任意场景成功率或控制算法的普遍排名。
 
-## 许可
+![PD+g、CTC 与笛卡尔阻抗实验](docs/media/control_comparison.png)
 
-代码 MIT。模型派生自高擎 `Panthera-HT_ROS2`（MIT），版权归原作者。
+## 项目组成
+
+| 板块 | 内容 |
+|---|---|
+| 机器人建模与分析 | Panthera 六轴与双指模型，工具中心点 TCP，正逆运动学、雅可比及动力学接口 |
+| 运动控制 | PD+g、CTC、笛卡尔阻抗、负载质量自适应、模型误差与扰动观测实验 |
+| 运动规划 | RRT-Connect、连续轨迹与时间分配，整机及携物碰撞查询 |
+| 操作任务 | 接触抓放与任务监督，SpaceMouse TOOL 六自由度遥操，夹爪开度与同拍记录 |
+| 感知 | 仿真腕部 RGB-D、同曝光时刻位姿、标记定位到抓取目标的坐标变换 |
+| 学习实验 | 状态 BC、ACT、Diffusion Policy 与参考辅助 PPO，分别评价预测误差和物理任务结果 |
+
+```mermaid
+flowchart LR
+    A[规划 / 遥操 / 策略] --> B[运动参考]
+    B --> C[控制器]
+    C --> D[MuJoCo 动力学与接触]
+    D --> E[关节 / 夹爪 / 物体状态]
+    E --> C
+    E --> F[任务监督与记录]
+    F --> A
+```
+
+仿真物理步长为 2 ms。任务根据实际接触、抬升、放稳、脱指和撤离条件推进；展示视频使用传统规划与控制链，学习实验单独报告。
+
+## 实现与来源
+
+项目工作包括 Panthera 模型与坐标适配、控制器对照、碰撞约束下的轨迹执行、接触任务监督，以及实验数据和演示材料的整理。机器人抓取与操作实践提供任务组织与算法参考；具体机器人参数、控制接口和实验评价面向 Panthera 实现。
+
+源码入口：[运动学](panthera/core/kinematics.py) · [动力学接口](panthera/core/robot.py) · [CTC](panthera/control/computed_torque.py) · [笛卡尔阻抗](panthera/control/impedance.py) · [动量观测器](panthera/control/momentum_observer.py) · [轨迹生成](panthera/planning/trajectory.py)。报告中的数值对应 [results.json](docs/results.json) 记录的实验版本与配置。
+
+机器人几何资源来自 [HighTorque Robotics Panthera-HT ROS2](https://github.com/HighTorque-Robotics/Panthera-HT_ROS2)，物理求解使用 [MuJoCo](https://github.com/google-deepmind/mujoco)。项目代码许可见 [LICENSE](LICENSE)；第三方资源遵循各自的来源与许可声明。
+
+相关项目：[FlyArm 空中操作](https://github.com/hrx2025lucky-lab/flyarm-aerial-manipulation) · [G1 全身运动](https://github.com/hrx2025lucky-lab/humanoid-g1-locomotion)

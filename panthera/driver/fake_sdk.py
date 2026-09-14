@@ -36,7 +36,7 @@ from panthera.core.robot import Q_HOME
 JOINT_LOWER = np.array([-2.4, -0.1, -0.1, -1.6, -1.7, -2.5])
 JOINT_UPPER = np.array([2.4, 3.2, 4.0, 1.6, 1.7, 2.5])
 GRIPPER_LIMITS = (0.0, 2.0)
-#: ⚠️ 这是**堵转**扭矩，不是可持续输出。见 docs/给客服的问题清单.md Q9
+#: ⚠️ 这是**堵转**扭矩，不是可持续输出。
 MAX_TORQUE = np.array([21.0, 36.0, 36.0, 21.0, 10.0, 10.0])
 
 

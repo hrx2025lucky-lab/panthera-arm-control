@@ -19,7 +19,7 @@ from panthera.identification.regressor import DynamicsRegressor
 
 XML = "models/panthera/panthera.xml"
 #: 力矩上限取 SDK 示例值，不是 URDF 的堵转扭矩，也不是手册额定扭矩。
-#: 三个来源必须分清——见 docs/参数辨识与sim2real.md
+#: 仿真实验的力矩预算与硬件额定值分别定义，不能互相替代。
 TAU_MAX_SDK = np.array([10.0, 20.0, 20.0, 10.0, 5.0, 5.0])
 NOISE_STD = 0.02  # N·m，力矩测量噪声
 

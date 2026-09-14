@@ -115,6 +115,5 @@ class RealBackend(ArmBackend):
 
     def __init__(self) -> None:  # pragma: no cover - 需要真实硬件
         raise NotImplementedError(
-            "真机后端尚未接入。接入步骤见本类 docstring，"
-            "以及 docs/参数辨识与sim2real.md 的『真机上电流程』。"
+            "此处不提供真机后端；本接口用于仿真。"
         )

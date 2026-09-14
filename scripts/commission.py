@@ -428,7 +428,7 @@ def summary(sim: bool) -> None:
   ⚠️ 把上面的数填进：
      - panthera/driver/real_backend.py  的 dt
      - panthera/driver/safety.py        的 watchdog_timeout
-     - docs/官方资料对照审计.md          的实测栏
+     - 本次设备测量记录（区分仿真输出与实测值）
 """)
     if sim:
         print("  ⚠️ 本次是【演练模式】，以上数字来自仿真，不是真机实测。")

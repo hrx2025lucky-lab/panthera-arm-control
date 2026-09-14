@@ -14,8 +14,7 @@ armctrl 依赖第三方的 ``mujoco_menagerie``（Franka Panda），那是个不
 的 ``panthera_ht_ros_description.urdf``（MIT）。转换过程见 ``tools/urdf_to_mjcf.py``，
 它补上了 URDF 里**没有、CAD 也导不出**的三样东西：执行器、转子反射惯量、关节摩擦。
 
-⚠️ 其中转子惯量与摩擦目前是**占位值**，必须由真机辨识回填，
-见 ``docs/参数辨识与sim2real.md``。
+⚠️ 其中转子惯量与摩擦是**占位值**，不代表真机辨识结果。
 """
 
 from __future__ import annotations
