@@ -1,0 +1,1731 @@
+{
+  "schema_version": 1,
+  "scope": "Frozen Panthera MuJoCo and offline results. Public summary and selected curve data; original complete records are not bundled. Metrics apply to each declared experiment.",
+  "runtime_mode": "mujoco_only",
+  "hardware_write_enabled": false,
+  "control": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "f6808e422d349fd5d0e2d48039d81e091012af51eb08fea0deb9db1662f42598",
+      "bytes": 31809,
+      "record_id": "control_benchmark/2026-09-09_current"
+    },
+    "configuration": {
+      "seed": 20260908,
+      "repeats": 3,
+      "joint_tracking": {
+        "q0_rad": [
+          0.0,
+          0.7,
+          0.7,
+          -0.1,
+          0.0,
+          0.0
+        ],
+        "amplitude_rad": [
+          0.3,
+          0.2,
+          0.3,
+          0.2,
+          0.3,
+          0.3
+        ],
+        "frequency_hz": 0.5,
+        "duration_s": 4.0,
+        "warmup_s": 1.0,
+        "smooth_start_ramp_s": 1.0,
+        "pd_kp": 20.0,
+        "pd_kd": 8.0,
+        "ctc_wn_rad_s": 30.0,
+        "ctc_zeta": 1.0
+      },
+      "impedance_f_over_k": {
+        "q0_rad": [
+          0.0,
+          0.7,
+          0.7,
+          -0.1,
+          0.0,
+          0.0
+        ],
+        "k_trans_n_m": 500.0,
+        "k_rot_nm_rad": 1.2,
+        "zeta": 1.0,
+        "damping_design": "fixed",
+        "force_z_n": -10.0,
+        "force_start_s": 0.5,
+        "force_end_s": 4.5,
+        "steady_window_s": [
+          3.5,
+          4.5
+        ],
+        "duration_s": 6.0,
+        "external_force_path": "mujoco.mj_applyFT at TCP"
+      }
+    },
+    "model": {
+      "path": "models/panthera/panthera.xml",
+      "sha256": "e43084e0b2a9579c301e13c39d024bde299fa9074e38c7a8611c2799affc90b4"
+    },
+    "source_fingerprints": {
+      "benchmark_runner": {
+        "path": "panthera/demos/control_benchmark.py",
+        "sha256": "6aba1b5b61f9af12a8cc99f8810f6c9b930044921e8ce61890302368702b4e14"
+      },
+      "computed_torque": {
+        "path": "panthera/control/computed_torque.py",
+        "sha256": "3578a12bff0c505de5d652da8e8cf591aa62ef60fd2b53726ffb9664c5e69ef5"
+      },
+      "cartesian_impedance": {
+        "path": "panthera/control/impedance.py",
+        "sha256": "53257b332afc9cd5cd86aee42c8a81de48bf0402f518088ad4e5cdcf3975e52f"
+      },
+      "pd_rollout_baseline": {
+        "path": "panthera/sim/rollout.py",
+        "sha256": "e0fe65761ca49152ffec7378fc1649e36c7947c08d5419aed47550d1a005c639"
+      },
+      "robot_model_api": {
+        "path": "panthera/core/robot.py",
+        "sha256": "8dcf8f1304d919ef9d522c0557ccb86268a3ec35b3865afe9762d46e5420d655"
+      },
+      "mujoco_backend": {
+        "path": "panthera/driver/mujoco_backend.py",
+        "sha256": "b0c7251dbc7b7d4aa0f419bad34d5bfba372aafc45add8eec76001542ea55e43"
+      },
+      "kinematics": {
+        "path": "panthera/core/kinematics.py",
+        "sha256": "342ad29e36a56f3003b890c241817c5abdd4b41aa478dfe674c45b8fd6211cdb"
+      },
+      "asset_resolver": {
+        "path": "panthera/assets.py",
+        "sha256": "9e6ee235d170ad4fe1440f3808d0f358785f913bc123a4cf25535f60707f4f29"
+      }
+    },
+    "joint_rmse_mrad": {
+      "pd_gravity": 7.191321551404324,
+      "computed_torque": 4.731385327366229
+    },
+    "impedance_f_over_k_relative_error_pct": 1.584208383095583,
+    "scope": "descriptive results for this fixed MuJoCo model and configuration; not a universal controller ranking and not real-robot evidence"
+  },
+  "adaptive": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "1a6b973dc1edc326902319f9d43fac025db52d460deb6d2704f9d02aebd3c9d1",
+      "bytes": 39901,
+      "record_id": "payload_adaptive/2026-09-11_formal_v1"
+    },
+    "physics_steps": 216000,
+    "runs": 36,
+    "comparisons": [
+      {
+        "plant_mass_kg": 0.0,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 0.07134174993268051,
+          "adaptive": 0.07127515729905176,
+          "known_mass_oracle": 0.07134174993268051
+        },
+        "adaptive_reduction_pct": 0.09334314576189273
+      },
+      {
+        "plant_mass_kg": 0.0,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 0.06420299491847106,
+          "adaptive": 0.0643321156602796,
+          "known_mass_oracle": 0.06420299491847106
+        },
+        "adaptive_reduction_pct": -0.20111326889424852
+      },
+      {
+        "plant_mass_kg": 0.062,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 2.5466853096414632,
+          "adaptive": 0.09617985642118684,
+          "known_mass_oracle": 0.07147968741483636
+        },
+        "adaptive_reduction_pct": 96.22333171448155
+      },
+      {
+        "plant_mass_kg": 0.062,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 2.5509456358163125,
+          "adaptive": 0.08953463998604554,
+          "known_mass_oracle": 0.06415375675246969
+        },
+        "adaptive_reduction_pct": 96.49013923586051
+      },
+      {
+        "plant_mass_kg": 0.124,
+        "frequency_hz": 0.25,
+        "rmse_mrad": {
+          "frozen_zero": 5.08747705575283,
+          "adaptive": 0.14449964651513952,
+          "known_mass_oracle": 0.07163992044026729
+        },
+        "adaptive_reduction_pct": 97.1596992982653
+      },
+      {
+        "plant_mass_kg": 0.124,
+        "frequency_hz": 0.35,
+        "rmse_mrad": {
+          "frozen_zero": 5.098621788155484,
+          "adaptive": 0.14000436917084735,
+          "known_mass_oracle": 0.06408936274175787
+        },
+        "adaptive_reduction_pct": 97.25407423833458
+      }
+    ],
+    "scope": "Single payload mass is adapted; payload COM and unit-mass inertia are known. Same feedback and reference across paired controllers; not full inertial identification."
+  },
+  "tall_obstacles": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "7b19d6b61b5348615b8dd52cc889909d585f8f9b35b4bf2da745c8360b46d427",
+      "bytes": 819,
+      "record_id": "tall_obstacles/2026-09-11_formal_v1"
+    },
+    "results": [
+      {
+        "case": "seed_30",
+        "seed": 30,
+        "task_pass": true,
+        "planning_pass": true,
+        "physics_steps": 21481,
+        "report_sha256": "7f558d66555508d713d2016bd13cdc88fd50964fe31f696b5ab016d8768df724"
+      },
+      {
+        "case": "seed_31",
+        "seed": 31,
+        "task_pass": true,
+        "planning_pass": true,
+        "physics_steps": 32438,
+        "report_sha256": "194a6352817a4e0aecd9d1681c111c6204c203346f9bf091493fbbf791ddb578"
+      },
+      {
+        "case": "blocked_goal",
+        "negative_pass": true,
+        "physics_steps": 0,
+        "report_sha256": "cae49a11bc14564d5debc253cbd2b843d72964d62b3674d540d965c3c6af830a"
+      }
+    ],
+    "physics_steps": 53919,
+    "scope": "One fixed seven-obstacle scene, 14-21 cm tall, two predeclared planner seeds, 6 mm query margin."
+  },
+  "visual_execution": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "589d159fbfb18c73b714ed58e6cf252f4de15ea9569b521ce4a11d922ea57173",
+      "bytes": 19619,
+      "record_id": "visual_execution/2026-09-11_observe_v2"
+    },
+    "successful_tasks": 1,
+    "declared_tasks": 2,
+    "expected_refusals": 4,
+    "declared_fault_cases": 4,
+    "physics_steps": 20543,
+    "qualification_pass": false,
+    "scope": "Known marker geometry, simulated RGB-D, same-exposure robot pose, known obstacle map, fixed observation pose; no real D405 or continuous visual-servo claim."
+  },
+  "grid": {
+    "source": {
+      "repository": "panthera-arm-control",
+      "sha256": "30bc25f49b6b4bceeaf1198be1ab0fb7a94bc5a5123144c36f0dbce5f2dcd3ab",
+      "bytes": 7975,
+      "record_id": "pick_place_grid/2026-09-09_grid100_report"
+    },
+    "cases": 100,
+    "successful_tasks": 100,
+    "physics_steps": 1793308,
+    "scope": "Deterministic 10x10 position grid, nominal model, known object poses; one execution per case. No random generalization, vision, learning or real-robot claim."
+  },
+  "media": [
+    {
+      "file": "assets/images/adaptive_overview_zh.png",
+      "sha256": "27e8fa0c66a59631bf95008cfffde4b29636f3747b70ff56826968e6b4b8f181",
+      "bytes": 133126,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/control_comparison.png",
+      "sha256": "e32d37804834b5f8c760c61f9019ca3c004ebc29828ed8f0c6b7b602e0342944",
+      "bytes": 136041,
+      "width": 1540,
+      "height": 980
+    },
+    {
+      "file": "assets/images/control_overview_zh.png",
+      "sha256": "55126810e807f515df4d0d7ed5aa2cfa0934af03493d3f11bdb8dba03d1d0320",
+      "bytes": 163748,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/grid100_dynamic.png",
+      "sha256": "50b44f566a6358e1cb4f3975d7ca47ccc6e5b33b8d591a6e4c543f3391535412",
+      "bytes": 153308,
+      "width": 1820,
+      "height": 1300
+    },
+    {
+      "file": "assets/images/gripper_force_zh.png",
+      "sha256": "78ae09f61460720a39e20381652c657867c8e39bfe2283bc29a13271dea856ff",
+      "bytes": 130007,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/identification_overview_zh.png",
+      "sha256": "30636b6eed2ddb2d3b32db9e9da29a20d9009a707b77f258f2c68079fa4c85a8",
+      "bytes": 148155,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/learning_chain.svg",
+      "sha256": "3cda49f1f21065d297a1e1e08b55d8a8fffe358f792aebdb86780f3e3eec5aaf",
+      "bytes": 2723
+    },
+    {
+      "file": "assets/images/marked_scene_cases_zh.png",
+      "sha256": "24ddcce9dd7b29d941d75fff531d7755fab25d1c2cb3051aa2f2f5d6b42e5e11",
+      "bytes": 220238,
+      "width": 1610,
+      "height": 1110
+    },
+    {
+      "file": "assets/images/model_error_comparison.png",
+      "sha256": "52c66381bfd10eb0af2e40f9a753055334da842cef048dee9ba84f8c4aa66ce6",
+      "bytes": 301058,
+      "width": 2240,
+      "height": 1600
+    },
+    {
+      "file": "assets/images/noslip_comparison.png",
+      "sha256": "9542435c172874742d0f5a41e0edacaae477b8f38128d87269a794baec58a61c",
+      "bytes": 155114,
+      "width": 1770,
+      "height": 1200
+    },
+    {
+      "file": "assets/images/observer_overview_zh.png",
+      "sha256": "59c3aa71e3284e69789103aba57af22b06e23c0008f4abc174873ef43a5f79fd",
+      "bytes": 134158,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/panthera_tall_poster.png",
+      "sha256": "2ddc79ab48f23fe84c0006ba0b82245c9e3972a329411286809119574b502835",
+      "bytes": 205256,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "assets/images/panthera_visual_execution_poster.png",
+      "sha256": "4e1465048a63deb754720be1c4f8d76083f92fdbe3748919f4b521311cefe27a",
+      "bytes": 260051,
+      "width": 1920,
+      "height": 1080
+    },
+    {
+      "file": "assets/images/payload_adaptive_comparison.png",
+      "sha256": "281fed281d67b7c177b699a4a2dfe05cd5c3fe6d46385f2fab3baa084080974b",
+      "bytes": 208487,
+      "width": 1920,
+      "height": 1280
+    },
+    {
+      "file": "assets/images/payload_robustness_zh.png",
+      "sha256": "8786ffce2dfd3a85f67a66d4787c1c15793f39b1c09ff61fda802ffd1dd26ac8",
+      "bytes": 262590,
+      "width": 1920,
+      "height": 1280
+    },
+    {
+      "file": "assets/images/pick_place_curves.png",
+      "sha256": "b76b79baeddfafa4ecab4696a497d850b2c007501a97a3abfa4c0c3676606ea9",
+      "bytes": 124029,
+      "width": 1430,
+      "height": 1170
+    },
+    {
+      "file": "assets/images/robotics_chain.svg",
+      "sha256": "cca42919e309964b7a11b6a99150461b226c51e103e6334ea26d8f60c3e9385f",
+      "bytes": 2707
+    },
+    {
+      "file": "assets/images/tall_paths_zh.png",
+      "sha256": "9fb4d8569f7b3ee4cc5ee94c32cd129a3913525e142ccb87218ff2eae4e7f861",
+      "bytes": 413269,
+      "width": 2250,
+      "height": 1095
+    },
+    {
+      "file": "assets/images/trajectory_zh.png",
+      "sha256": "b87f33f870b0fda27f04275e1cf1b70c40c1986573cd52b6d34bf53c28d15c08",
+      "bytes": 172287,
+      "width": 2080,
+      "height": 896
+    },
+    {
+      "file": "assets/images/visual_execution_zh.png",
+      "sha256": "ad04153a16cf7615a8e79c0474c2e354965d81741b4c90ecc8f749d8ac2453c4",
+      "bytes": 285684,
+      "width": 1920,
+      "height": 1200
+    },
+    {
+      "file": "assets/previews/panthera_motion_preview.gif",
+      "sha256": "477bec79990079f4621993e6dc7c184be63168c9a29a9a8a0d687a5a22e8c638",
+      "bytes": 6479529,
+      "width": 768,
+      "height": 432,
+      "frames": 611,
+      "duration_s": 30.55,
+      "loop": 0
+    },
+    {
+      "file": "assets/previews/panthera_tall_preview.gif",
+      "sha256": "5194d1a3d49800a45414593f0708ea9768b8589e07cfbfedfeda776e9d74e0df",
+      "bytes": 9217907,
+      "width": 768,
+      "height": 432,
+      "frames": 860,
+      "duration_s": 43.0,
+      "loop": 0
+    },
+    {
+      "file": "assets/previews/panthera_visual_preview.gif",
+      "sha256": "54a73c7285c752d4e325461fe7342d65abbe1496813f7f90aa6a2f3700e9cbfa",
+      "bytes": 7953875,
+      "width": 768,
+      "height": 432,
+      "frames": 822,
+      "duration_s": 41.1,
+      "loop": 0
+    },
+    {
+      "file": "assets/videos/panthera_motion_zh_v2.mp4",
+      "sha256": "cc8674b501242635f35e9009095adb89feb7e40eac04b919b90dbcc84a4f1b75",
+      "bytes": 4030037,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "50/1",
+            "nb_frames": "1528"
+          }
+        ],
+        "format": {
+          "duration": "30.560000"
+        }
+      }
+    },
+    {
+      "file": "assets/videos/panthera_tall_zh.mp4",
+      "sha256": "f91345a8e1bc2b52284b030280803a63bb21d692a0ce4907d7eeae14a37c8a75",
+      "bytes": 6300708,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "50/1",
+            "nb_frames": "2149"
+          }
+        ],
+        "format": {
+          "duration": "42.980000"
+        }
+      }
+    },
+    {
+      "file": "assets/videos/panthera_visual_execution_zh.mp4",
+      "sha256": "74b7d13178ff99c99936b0fc969cadf44d08afaeea78482e6bd461b3ed17f241",
+      "bytes": 6123723,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "h264",
+            "width": 1920,
+            "height": 1080,
+            "r_frame_rate": "50/1",
+            "nb_frames": "2055"
+          }
+        ],
+        "format": {
+          "duration": "41.100000"
+        }
+      }
+    }
+  ],
+  "learning": {
+    "act": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_act/2026-09-11_rollout_v1",
+        "sha256": "090f51f41fbe7ee761fc336953e245478ac203d8f3e91b2fb7021742780a41fb",
+        "bytes": 13618
+      },
+      "observation": "simulation state; no image encoder",
+      "declared_tasks": 2,
+      "successful_tasks": 0,
+      "physics_steps": 22695
+    },
+    "diffusion_policy": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_diffusion/2026-09-11_rollout_v1",
+        "sha256": "12445d9fd640e3e92c84e379be9b0313a8e3a30feb3d4703c35c123d9cd20a15",
+        "bytes": 13820
+      },
+      "observation": "simulation state; no image encoder",
+      "declared_tasks": 2,
+      "successful_tasks": 0,
+      "physics_steps": 50000
+    },
+    "ppo": {
+      "source": {
+        "repository": "panthera-arm-control",
+        "record_id": "m4_ppo/2026-09-11_train_v2",
+        "sha256": "85229ca6fdff0ebe0160b1d06e8f5a316fded9a66710888244871954d08545aa",
+        "bytes": 41452
+      },
+      "observation": "simulation state and scripted reference",
+      "comparisons": {
+        "zero_residual_reused": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        },
+        "untrained": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        },
+        "trained": {
+          "declared_tasks": 2,
+          "successful_tasks": 2
+        }
+      },
+      "scope": "Equal task completion across all three groups does not establish a learning benefit."
+    }
+  },
+  "control_curves": {
+    "file": "evidence/control_curves.json",
+    "sha256": "b8809259cee521eba80cd8d23ec8d86fc63ef624a6a89d45fe69d5c82540d60c",
+    "source": {
+      "record_id": "control_benchmark/2026-09-09_current",
+      "samples_sha256": "cad96cad6e7a4a645b9b1de2bd06d37e39089ab52991a620d3a6973de87793a2",
+      "summary_sha256": "f6808e422d349fd5d0e2d48039d81e091012af51eb08fea0deb9db1662f42598",
+      "repeat": 1,
+      "sample_stride": 10,
+      "physical_step_s": 0.002,
+      "plotted_values": "Original samples, without smoothing; include the last original point."
+    },
+    "sampled_tracking_points": 201,
+    "sampled_impedance_points": 301
+  },
+  "additional_experiments": {
+    "trajectory": {
+      "source": {
+        "record_id": "trajectory_benchmark/2026-09-09_current",
+        "sha256": "870c4263a82f42d0bfd42fb182cad5c574c2469312f1fdf200d3fb8b1e935145",
+        "bytes": 13711
+      },
+      "metrics": {
+        "sample_count": 2290,
+        "joint_rmse_rad": 0.004637152041054939,
+        "joint_rmse_per_axis_rad": [
+          0.0031653464868899184,
+          0.0005165152625804902,
+          0.0032614272166919217,
+          0.0087710895318064,
+          0.004302981690579937,
+          0.0035564444911183593
+        ],
+        "peak_joint_error_rad": 0.010603051051534008,
+        "final_hold_sample_count": 101,
+        "final_hold_max_error_rad": 0.005763483211535608,
+        "final_hold_max_speed_rad_s": 0.0036477844961145516,
+        "raw_torque_peak_per_axis_nm": [
+          0.3130457779013762,
+          0.9518174797004233,
+          6.055430668595244,
+          1.809682417982289,
+          0.060514424832150436,
+          0.05283139940696871
+        ],
+        "accepted_torque_peak_per_axis_nm": [
+          0.3130457779013762,
+          0.9518174797004233,
+          6.055430668595244,
+          1.809682417982289,
+          0.060514424832150436,
+          0.05283139940696871
+        ],
+        "applied_torque_peak_per_axis_nm": [
+          0.3130457779013762,
+          0.9518174797004233,
+          6.055430668595244,
+          1.809682417982289,
+          0.060514424832150436,
+          0.05283139940696871
+        ],
+        "raw_torque_max_utilization_pct": 30.27715334297622,
+        "raw_saturation_samples": 0,
+        "contact_samples": 0,
+        "joint_limit_violation_samples": 0,
+        "maximum_backend_time_error_s": 2.824407374646398e-13,
+        "applied_accepted_max_difference_nm": 0.0
+      },
+      "configuration": {
+        "waypoints_rad": [
+          [
+            0.0,
+            0.7,
+            0.7,
+            -0.1,
+            0.0,
+            0.0
+          ],
+          [
+            0.12,
+            0.62,
+            0.76,
+            -0.2,
+            0.07,
+            0.0
+          ],
+          [
+            0.12,
+            0.62,
+            0.76,
+            -0.2,
+            0.07,
+            0.0
+          ],
+          [
+            -0.1,
+            0.75,
+            0.6,
+            -0.03,
+            0.0,
+            0.08
+          ],
+          [
+            -0.1,
+            0.75,
+            0.6,
+            -0.03,
+            0.002,
+            0.08
+          ],
+          [
+            0.0,
+            0.7,
+            0.7,
+            -0.1,
+            0.0,
+            0.0
+          ]
+        ],
+        "v_max_rad_s": [
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25,
+          0.25
+        ],
+        "a_max_rad_s2": [
+          0.8,
+          0.8,
+          0.8,
+          0.8,
+          0.8,
+          0.8
+        ],
+        "j_max_rad_s3": [
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          4.0,
+          4.0
+        ],
+        "repeats": 3,
+        "ctc_wn_rad_s": 30.0,
+        "ctc_zeta": 1.0,
+        "final_hold_s": 1.0,
+        "hold_evaluation_window_s": 0.2,
+        "max_joint_rmse_rad": 0.01,
+        "max_joint_error_rad": 0.03,
+        "max_hold_error_rad": 0.01,
+        "max_hold_speed_rad_s": 0.01,
+        "max_deterministic_span": 1e-12,
+        "derivative_tolerance": 1e-07,
+        "bound_tolerance": 1e-09,
+        "gravity_compensation": true,
+        "gripper_motor_target_rad": 0.0,
+        "actuator_latency_steps": 0
+      },
+      "repeat_count": 3,
+      "overall_pass": true
+    },
+    "observer": {
+      "source": {
+        "record_id": "momentum_friction_study/2026-09-09_current",
+        "sha256": "89414d41e9b8111a37e62050ccdfee5cee92e5584bac0ee9fa6ec6efa88627ec",
+        "bytes": 53656
+      },
+      "cases": {
+        "nominal": {
+          "interval_detection": {
+            "onset_s": 0.008000000000000007,
+            "confirmed_s": 0.10600000000000001
+          },
+          "interval_zero_compatible": {
+            "onset_s": 0.12600000000000033,
+            "confirmed_s": 0.22400000000000034
+          },
+          "interval_late_false_alarm_samples": 0,
+          "late_samples": 1250,
+          "filtered_injection_coverage_pct": 100.0
+        },
+        "home_positive": {
+          "interval_detection": {
+            "onset_s": 0.008000000000000007,
+            "confirmed_s": 0.10600000000000001
+          },
+          "interval_zero_compatible": {
+            "onset_s": 0.12600000000000033,
+            "confirmed_s": 0.22400000000000034
+          },
+          "interval_late_false_alarm_samples": 0,
+          "late_samples": 1250,
+          "filtered_injection_coverage_pct": 100.0
+        },
+        "home_smaller": {
+          "interval_detection": {
+            "onset_s": 0.016000000000000014,
+            "confirmed_s": 0.11400000000000002
+          },
+          "interval_zero_compatible": {
+            "onset_s": 0.08800000000000008,
+            "confirmed_s": 0.18600000000000008
+          },
+          "interval_late_false_alarm_samples": 0,
+          "late_samples": 1250,
+          "filtered_injection_coverage_pct": 100.0
+        },
+        "offset_negative": {
+          "interval_detection": {
+            "onset_s": 0.01200000000000001,
+            "confirmed_s": 0.11000000000000001
+          },
+          "interval_zero_compatible": {
+            "onset_s": 0.10599999999999987,
+            "confirmed_s": 0.20399999999999988
+          },
+          "interval_late_false_alarm_samples": 0,
+          "late_samples": 1250,
+          "filtered_injection_coverage_pct": 100.0
+        },
+        "offset_positive": {
+          "interval_detection": {
+            "onset_s": 0.01200000000000001,
+            "confirmed_s": 0.11000000000000001
+          },
+          "interval_zero_compatible": {
+            "onset_s": 0.10599999999999987,
+            "confirmed_s": 0.20399999999999988
+          },
+          "interval_late_false_alarm_samples": 0,
+          "late_samples": 1250,
+          "filtered_injection_coverage_pct": 100.0
+        }
+      },
+      "scope": "Conditional interval for filtered torque under declared friction bounds; not physical collision detection."
+    },
+    "identification_control": {
+      "source": {
+        "record_id": "identified_control/2026-09-10_formal",
+        "sha256": "50af978a42602804985630403f0d8d3528b076ac2b208c67d8a33179ebbeb341",
+        "bytes": 29755
+      },
+      "physics_steps": 48000,
+      "runs": [
+        {
+          "controller": "pd_gravity",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.010129136363877344,
+            "per_joint_rmse_rad": [
+              0.00787481611242827,
+              0.008705634592699251,
+              0.019947554145991135,
+              0.008630415095817441,
+              0.0017685821113139254,
+              0.0015095544323246407
+            ],
+            "max_abs_tracking_error_rad": 0.033843292323510465,
+            "torque_rms_nm": 2.5650627599111147,
+            "max_raw_torque_utilization_pct": 33.084992357700486,
+            "max_applied_torque_utilization_pct": 33.084992357700486,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9651177815037275,
+            "gravity_model_error_rms_nm": 0.12496425042950383,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009730949166699822
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.010129136363877344,
+            "per_joint_rmse_rad": [
+              0.00787481611242827,
+              0.008705634592699251,
+              0.019947554145991135,
+              0.008630415095817441,
+              0.0017685821113139254,
+              0.0015095544323246407
+            ],
+            "max_abs_tracking_error_rad": 0.033843292323510465,
+            "torque_rms_nm": 2.5650627599111147,
+            "max_raw_torque_utilization_pct": 33.084992357700486,
+            "max_applied_torque_utilization_pct": 33.084992357700486,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9651177815037275,
+            "gravity_model_error_rms_nm": 0.12496425042950383,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009730949166699822
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.004757259801632331,
+            "per_joint_rmse_rad": [
+              0.00449122672837854,
+              0.002001019318342385,
+              0.0008377840185412519,
+              0.005223376835704599,
+              0.007010242972357728,
+              0.005872382388970475
+            ],
+            "max_abs_tracking_error_rad": 0.008662481466187533,
+            "torque_rms_nm": 2.559971530740727,
+            "max_raw_torque_utilization_pct": 33.160317203136614,
+            "max_applied_torque_utilization_pct": 33.160317203136614,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9433119689734116,
+            "gravity_model_error_rms_nm": 0.12494090500837156,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009731275097780106
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.004757259801632331,
+            "per_joint_rmse_rad": [
+              0.00449122672837854,
+              0.002001019318342385,
+              0.0008377840185412519,
+              0.005223376835704599,
+              0.007010242972357728,
+              0.005872382388970475
+            ],
+            "max_abs_tracking_error_rad": 0.008662481466187533,
+            "torque_rms_nm": 2.559971530740727,
+            "max_raw_torque_utilization_pct": 33.160317203136614,
+            "max_applied_torque_utilization_pct": 33.160317203136614,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9433119689734116,
+            "gravity_model_error_rms_nm": 0.12494090500837156,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009731275097780106
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "identified_model",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0074511183051913935,
+            "per_joint_rmse_rad": [
+              0.00786280605094997,
+              0.00451577570836638,
+              0.014173249789804178,
+              0.006719792420826595,
+              0.0016263146360953034,
+              0.001489132521255863
+            ],
+            "max_abs_tracking_error_rad": 0.02146740721536,
+            "torque_rms_nm": 2.558865268714571,
+            "max_raw_torque_utilization_pct": 33.09468858402778,
+            "max_applied_torque_utilization_pct": 33.09468858402778,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9661849413720631,
+            "gravity_model_error_rms_nm": 0.00042991217970719505,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125557774228794
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "identified_model",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0074511183051913935,
+            "per_joint_rmse_rad": [
+              0.00786280605094997,
+              0.00451577570836638,
+              0.014173249789804178,
+              0.006719792420826595,
+              0.0016263146360953034,
+              0.001489132521255863
+            ],
+            "max_abs_tracking_error_rad": 0.02146740721536,
+            "torque_rms_nm": 2.558865268714571,
+            "max_raw_torque_utilization_pct": 33.09468858402778,
+            "max_applied_torque_utilization_pct": 33.09468858402778,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9661849413720631,
+            "gravity_model_error_rms_nm": 0.00042991217970719505,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125557774228794
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "identified_model",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.005600673979981756,
+            "per_joint_rmse_rad": [
+              0.004729381247196601,
+              0.0019049842953557368,
+              0.00034481559909835697,
+              0.004716761751825414,
+              0.007867777449900316,
+              0.00882839854171506
+            ],
+            "max_abs_tracking_error_rad": 0.010940911234714624,
+            "torque_rms_nm": 2.5597787488131845,
+            "max_raw_torque_utilization_pct": 33.162497922492626,
+            "max_applied_torque_utilization_pct": 33.162497922492626,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9445318475236745,
+            "gravity_model_error_rms_nm": 0.0004281288591731014,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125232994592897
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "identified_model",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.005600673979981756,
+            "per_joint_rmse_rad": [
+              0.004729381247196601,
+              0.0019049842953557368,
+              0.00034481559909835697,
+              0.004716761751825414,
+              0.007867777449900316,
+              0.00882839854171506
+            ],
+            "max_abs_tracking_error_rad": 0.010940911234714624,
+            "torque_rms_nm": 2.5597787488131845,
+            "max_raw_torque_utilization_pct": 33.162497922492626,
+            "max_applied_torque_utilization_pct": 33.162497922492626,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9445318475236745,
+            "gravity_model_error_rms_nm": 0.0004281288591731014,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125232994592897
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "known_load_model",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.007451469276994349,
+            "per_joint_rmse_rad": [
+              0.007862785028913145,
+              0.004513116369326581,
+              0.014172304074869801,
+              0.0067252460136374955,
+              0.0016263701256301346,
+              0.0014921601864073344
+            ],
+            "max_abs_tracking_error_rad": 0.021466980923281587,
+            "torque_rms_nm": 2.5588605969976776,
+            "max_raw_torque_utilization_pct": 33.09451907206792,
+            "max_applied_torque_utilization_pct": 33.09451907206792,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9661682876523038,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773834118916894
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "known_load_model",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.007451469276994349,
+            "per_joint_rmse_rad": [
+              0.007862785028913145,
+              0.004513116369326581,
+              0.014172304074869801,
+              0.0067252460136374955,
+              0.0016263701256301346,
+              0.0014921601864073344
+            ],
+            "max_abs_tracking_error_rad": 0.021466980923281587,
+            "torque_rms_nm": 2.5588605969976776,
+            "max_raw_torque_utilization_pct": 33.09451907206792,
+            "max_applied_torque_utilization_pct": 33.09451907206792,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9661682876523038,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773834118916894
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "known_load_model",
+          "frequency_hz": 0.5,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0046390286240821895,
+            "per_joint_rmse_rad": [
+              0.0044728153092503135,
+              0.0019500448703964294,
+              0.0003436015753937709,
+              0.004875967622501391,
+              0.007000695729136607,
+              0.005693145411181182
+            ],
+            "max_abs_tracking_error_rad": 0.008675574650548384,
+            "torque_rms_nm": 2.559815226796386,
+            "max_raw_torque_utilization_pct": 33.168230988840634,
+            "max_applied_torque_utilization_pct": 33.168230988840634,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9445116025923727,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009774011494235827
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "known_load_model",
+          "frequency_hz": 0.5,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0046390286240821895,
+            "per_joint_rmse_rad": [
+              0.0044728153092503135,
+              0.0019500448703964294,
+              0.0003436015753937709,
+              0.004875967622501391,
+              0.007000695729136607,
+              0.005693145411181182
+            ],
+            "max_abs_tracking_error_rad": 0.008675574650548384,
+            "torque_rms_nm": 2.559815226796386,
+            "max_raw_torque_utilization_pct": 33.168230988840634,
+            "max_applied_torque_utilization_pct": 33.168230988840634,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.9445116025923727,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009774011494235827
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.008734463052644935,
+            "per_joint_rmse_rad": [
+              0.007935237077413936,
+              0.008483544000099243,
+              0.01583520153137235,
+              0.008125383037914635,
+              0.0017200635298320506,
+              0.0017528511154875025
+            ],
+            "max_abs_tracking_error_rad": 0.027040570953927756,
+            "torque_rms_nm": 2.4929055297147356,
+            "max_raw_torque_utilization_pct": 32.455893615577466,
+            "max_applied_torque_utilization_pct": 32.455893615577466,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6700085126870021,
+            "gravity_model_error_rms_nm": 0.1264633125583629,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009730995084334055
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.008734463052644935,
+            "per_joint_rmse_rad": [
+              0.007935237077413936,
+              0.008483544000099243,
+              0.01583520153137235,
+              0.008125383037914635,
+              0.0017200635298320506,
+              0.0017528511154875025
+            ],
+            "max_abs_tracking_error_rad": 0.027040570953927756,
+            "torque_rms_nm": 2.4929055297147356,
+            "max_raw_torque_utilization_pct": 32.455893615577466,
+            "max_applied_torque_utilization_pct": 32.455893615577466,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6700085126870021,
+            "gravity_model_error_rms_nm": 0.1264633125583629,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009730995084334055
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.004638270670043137,
+            "per_joint_rmse_rad": [
+              0.004315991103057979,
+              0.0018854711895054594,
+              0.0008325141278166106,
+              0.005381836249112575,
+              0.006862550048377845,
+              0.005490602306814486
+            ],
+            "max_abs_tracking_error_rad": 0.008319982574599344,
+            "torque_rms_nm": 2.486447300315133,
+            "max_raw_torque_utilization_pct": 32.24085607678159,
+            "max_applied_torque_utilization_pct": 32.24085607678159,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6610804081827615,
+            "gravity_model_error_rms_nm": 0.12625500297432374,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009731274654244353
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "unmodeled_load",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.004638270670043137,
+            "per_joint_rmse_rad": [
+              0.004315991103057979,
+              0.0018854711895054594,
+              0.0008325141278166106,
+              0.005381836249112575,
+              0.006862550048377845,
+              0.005490602306814486
+            ],
+            "max_abs_tracking_error_rad": 0.008319982574599344,
+            "torque_rms_nm": 2.486447300315133,
+            "max_raw_torque_utilization_pct": 32.24085607678159,
+            "max_applied_torque_utilization_pct": 32.24085607678159,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6610804081827615,
+            "gravity_model_error_rms_nm": 0.12625500297432374,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009731274654244353
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "identified_model",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.006158010055219192,
+            "per_joint_rmse_rad": [
+              0.007925011475959344,
+              0.005439873296069545,
+              0.009713269796558061,
+              0.005944468961541755,
+              0.0016675584518588147,
+              0.0016320006445709728
+            ],
+            "max_abs_tracking_error_rad": 0.015449051479337617,
+            "torque_rms_nm": 2.4830864704261826,
+            "max_raw_torque_utilization_pct": 32.33313400427026,
+            "max_applied_torque_utilization_pct": 32.33313400427026,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6708946214171634,
+            "gravity_model_error_rms_nm": 0.0004963234648417812,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.0071255534848951455
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "identified_model",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.006158010055219192,
+            "per_joint_rmse_rad": [
+              0.007925011475959344,
+              0.005439873296069545,
+              0.009713269796558061,
+              0.005944468961541755,
+              0.0016675584518588147,
+              0.0016320006445709728
+            ],
+            "max_abs_tracking_error_rad": 0.015449051479337617,
+            "torque_rms_nm": 2.4830864704261826,
+            "max_raw_torque_utilization_pct": 32.33313400427026,
+            "max_applied_torque_utilization_pct": 32.33313400427026,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6708946214171634,
+            "gravity_model_error_rms_nm": 0.0004963234648417812,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.0071255534848951455
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "identified_model",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.005348734934482615,
+            "per_joint_rmse_rad": [
+              0.004567307029049816,
+              0.0017972714865678282,
+              0.00029694250039583053,
+              0.004851508511888148,
+              0.00770895209383972,
+              0.008031815612145892
+            ],
+            "max_abs_tracking_error_rad": 0.009669257537965353,
+            "torque_rms_nm": 2.4861525078274456,
+            "max_raw_torque_utilization_pct": 32.22244344995674,
+            "max_applied_torque_utilization_pct": 32.22244344995674,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6621677835029162,
+            "gravity_model_error_rms_nm": 0.0004945538036079421,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125223124226623
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "identified_model",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.005348734934482615,
+            "per_joint_rmse_rad": [
+              0.004567307029049816,
+              0.0017972714865678282,
+              0.00029694250039583053,
+              0.004851508511888148,
+              0.00770895209383972,
+              0.008031815612145892
+            ],
+            "max_abs_tracking_error_rad": 0.009669257537965353,
+            "torque_rms_nm": 2.4861525078274456,
+            "max_raw_torque_utilization_pct": 32.22244344995674,
+            "max_applied_torque_utilization_pct": 32.22244344995674,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6621677835029162,
+            "gravity_model_error_rms_nm": 0.0004945538036079421,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.007125223124226623
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "known_load_model",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.006158657242226524,
+            "per_joint_rmse_rad": [
+              0.007924996262834395,
+              0.005440289739659666,
+              0.009712967213756384,
+              0.005948862494106544,
+              0.0016671798538948068,
+              0.0016315177631467243
+            ],
+            "max_abs_tracking_error_rad": 0.015454339375936432,
+            "torque_rms_nm": 2.483078906460963,
+            "max_raw_torque_utilization_pct": 32.3332096733762,
+            "max_applied_torque_utilization_pct": 32.3332096733762,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6708785152975365,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773851526191249
+          }
+        },
+        {
+          "controller": "pd_gravity",
+          "condition": "known_load_model",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.006158657242226524,
+            "per_joint_rmse_rad": [
+              0.007924996262834395,
+              0.005440289739659666,
+              0.009712967213756384,
+              0.005948862494106544,
+              0.0016671798538948068,
+              0.0016315177631467243
+            ],
+            "max_abs_tracking_error_rad": 0.015454339375936432,
+            "torque_rms_nm": 2.483078906460963,
+            "max_raw_torque_utilization_pct": 32.3332096733762,
+            "max_applied_torque_utilization_pct": 32.3332096733762,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.6708785152975365,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773851526191249
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "known_load_model",
+          "frequency_hz": 0.35,
+          "repeat": 0,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0045105116364299765,
+            "per_joint_rmse_rad": [
+              0.004295487672631541,
+              0.0018458782414314848,
+              0.0003371787377372869,
+              0.004997056579175846,
+              0.006875661589850959,
+              0.005277388014111065
+            ],
+            "max_abs_tracking_error_rad": 0.008322601817350395,
+            "torque_rms_nm": 2.486152550914679,
+            "max_raw_torque_utilization_pct": 32.221448875786194,
+            "max_applied_torque_utilization_pct": 32.221448875786194,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.661803758732645,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773999739249167
+          }
+        },
+        {
+          "controller": "computed_torque",
+          "condition": "known_load_model",
+          "frequency_hz": 0.35,
+          "repeat": 1,
+          "metrics": {
+            "steps": 2000,
+            "joint_rmse_rad": 0.0045105116364299765,
+            "per_joint_rmse_rad": [
+              0.004295487672631541,
+              0.0018458782414314848,
+              0.0003371787377372869,
+              0.004997056579175846,
+              0.006875661589850959,
+              0.005277388014111065
+            ],
+            "max_abs_tracking_error_rad": 0.008322601817350395,
+            "torque_rms_nm": 2.486152550914679,
+            "max_raw_torque_utilization_pct": 32.221448875786194,
+            "max_applied_torque_utilization_pct": 32.221448875786194,
+            "saturated_steps": 0,
+            "joint_limit_violations": 0,
+            "max_joint_speed_rad_s": 0.661803758732645,
+            "gravity_model_error_rms_nm": 0.0,
+            "accepted_applied_max_error_nm": 0.0,
+            "effective_mass_min_eigenvalue": 0.009773999739249167
+          }
+        }
+      ]
+    },
+    "gripper_force": {
+      "source": {
+        "record_id": "gripper_force/2026-09-10_v1",
+        "sha256": "c216593d9a4e4dfe3d62708dac7c915a7ff85fb5d0371410b1ab96f8fd8ac187",
+        "bytes": 15218
+      },
+      "physics_steps": 16000,
+      "results": {
+        "fixed_opening": {
+          "windows": [
+            {
+              "target_n": 1.0,
+              "sample_count": 500,
+              "rmse_n": 2.7356364006373295,
+              "mean_left_n": 3.7263112527434203,
+              "mean_right_n": 3.744961502395112,
+              "max_imbalance_n": 0.05929913434607803,
+              "bilateral_samples": 500
+            },
+            {
+              "target_n": 2.0,
+              "sample_count": 500,
+              "rmse_n": 1.7340731229376545,
+              "mean_left_n": 3.71288838690555,
+              "mean_right_n": 3.755257857510547,
+              "max_imbalance_n": 0.04342681766765244,
+              "bilateral_samples": 500
+            }
+          ],
+          "peak_per_finger_n": 3.783361490209078,
+          "maximum_command_rate_rad_s": 0.5000000000000004,
+          "quality_gates": {
+            "complete": true,
+            "aligned": true,
+            "bounded_reference": true,
+            "no_unexpected_contacts": true,
+            "no_torque_saturation": true,
+            "no_joint_limit_violation": true,
+            "torque_applied": true,
+            "arm_hold": true,
+            "bounded_penetration": true,
+            "released": true,
+            "windows_complete": true,
+            "bilateral_windows": true,
+            "force_tracking": false,
+            "balanced_fingers": true,
+            "regulated_peak": false
+          },
+          "runtime_error": null,
+          "overall_pass": false
+        },
+        "force_feedback": {
+          "windows": [
+            {
+              "target_n": 1.0,
+              "sample_count": 500,
+              "rmse_n": 0.0001286853932171934,
+              "mean_left_n": 0.9942469820606642,
+              "mean_right_n": 1.0055192884706432,
+              "max_imbalance_n": 0.012297262031341738,
+              "bilateral_samples": 500
+            },
+            {
+              "target_n": 2.0,
+              "sample_count": 500,
+              "rmse_n": 0.00400804119935057,
+              "mean_left_n": 1.9955647922047144,
+              "mean_right_n": 1.9971602362212875,
+              "max_imbalance_n": 0.002154249620219817,
+              "bilateral_samples": 500
+            }
+          ],
+          "peak_per_finger_n": 1.9987810072075913,
+          "maximum_command_rate_rad_s": 0.5000000000000004,
+          "quality_gates": {
+            "complete": true,
+            "aligned": true,
+            "bounded_reference": true,
+            "no_unexpected_contacts": true,
+            "no_torque_saturation": true,
+            "no_joint_limit_violation": true,
+            "torque_applied": true,
+            "arm_hold": true,
+            "bounded_penetration": true,
+            "released": true,
+            "windows_complete": true,
+            "bilateral_windows": true,
+            "force_tracking": true,
+            "balanced_fingers": true,
+            "regulated_peak": true
+          },
+          "runtime_error": null,
+          "overall_pass": true
+        }
+      },
+      "scope": "Per-finger mean normal force in two fixed steady windows, noiseless supported object simulation."
+    },
+    "adaptive_robustness": {
+      "source": {
+        "record_id": "payload_robustness/2026-09-11_formal_v1",
+        "sha256": "4e312ef24e1276eee090d3ab85d8e1bae136e32a8eb58928266aecab6454b407",
+        "bytes": 38529
+      },
+      "physics_steps": 192000,
+      "comparisons": [
+        {
+          "case": "matched_shape",
+          "frequency_hz": 0.3,
+          "rmse_mrad": {
+            "frozen_zero": 2.550713040202708,
+            "adaptive": 0.08747027981339477
+          },
+          "adaptive_reduction_pct": 96.57075184723864
+        },
+        {
+          "case": "matched_shape",
+          "frequency_hz": 0.4,
+          "rmse_mrad": {
+            "frozen_zero": 2.5514973483846037,
+            "adaptive": 0.09266749908966311
+          },
+          "adaptive_reduction_pct": 96.36811305532682
+        },
+        {
+          "case": "com_offset",
+          "frequency_hz": 0.3,
+          "rmse_mrad": {
+            "frozen_zero": 2.8820975379307128,
+            "adaptive": 0.3348797144963106
+          },
+          "adaptive_reduction_pct": 88.38069461255127
+        },
+        {
+          "case": "com_offset",
+          "frequency_hz": 0.4,
+          "rmse_mrad": {
+            "frozen_zero": 2.8813612641315447,
+            "adaptive": 0.33762822700178324
+          },
+          "adaptive_reduction_pct": 88.28233615809555
+        },
+        {
+          "case": "friction_bias",
+          "frequency_hz": 0.3,
+          "rmse_mrad": {
+            "frozen_zero": 3.171855602287177,
+            "adaptive": 1.7726007642989714
+          },
+          "adaptive_reduction_pct": 44.11470802703704
+        },
+        {
+          "case": "friction_bias",
+          "frequency_hz": 0.4,
+          "rmse_mrad": {
+            "frozen_zero": 2.9704666797022474,
+            "adaptive": 1.7159187090869885
+          },
+          "adaptive_reduction_pct": 42.23403612596698
+        },
+        {
+          "case": "combined",
+          "frequency_hz": 0.3,
+          "rmse_mrad": {
+            "frozen_zero": 3.455000485452219,
+            "adaptive": 1.8112330819886562
+          },
+          "adaptive_reduction_pct": 47.57647387850983
+        },
+        {
+          "case": "combined",
+          "frequency_hz": 0.4,
+          "rmse_mrad": {
+            "frozen_zero": 3.2398980064083682,
+            "adaptive": 1.731017267036355
+          },
+          "adaptive_reduction_pct": 46.571859249504676
+        }
+      ]
+    },
+    "perception": {
+      "source": {
+        "record_id": "marked_scene/2026-09-11_colors_v1",
+        "sha256": "f9232c9b46232a30c388ad23661d67e51598a8eae180fc3a0559f5d5cb71e5f8",
+        "bytes": 11050
+      },
+      "survey_frames": 23,
+      "survey_proposals": 18,
+      "survey_refusals": 5,
+      "precontact_proposals": 5,
+      "max_center_error_m": 0.00019164288737613365,
+      "max_rotation_error_deg": 0.10051892681530071,
+      "fault_rejections_passed": 5
+    },
+    "continuous_motion": {
+      "source": {
+        "record_id": "continuous_pick_place/2026-09-11_v1_retry1/seed_20",
+        "sha256": "351c9edd301e22c90c14573599b8cc467f39b3afc678874bee0a76c22cb251a8",
+        "bytes": 705827
+      },
+      "task_pass": true
+    },
+    "act_training": {
+      "source": {
+        "record_id": "m4_act/2026-09-11_train_v1",
+        "sha256": "6987909d2e005a9a9bdba460ba4f1d219611e57b01d4e883d022561e47500267",
+        "bytes": 14346
+      },
+      "parameters": 1345191,
+      "optimizer_updates": 3600,
+      "selected_epoch": 70,
+      "offline_metrics": {
+        "train": {
+          "joint_rmse_rad": 0.003577721845401552,
+          "gripper_fraction_rmse": 0.03017893999645374,
+          "first_joint_rmse_rad": 0.00032473832974763147,
+          "first_gripper_fraction_rmse": 0.03373936453146256
+        },
+        "validation": {
+          "joint_rmse_rad": 0.0035723144577911236,
+          "gripper_fraction_rmse": 0.03148753794876001,
+          "first_joint_rmse_rad": 0.0002959008666336653,
+          "first_gripper_fraction_rmse": 0.034973874447033135
+        },
+        "correction": {
+          "joint_rmse_rad": 0.003995254127612863,
+          "gripper_fraction_rmse": 0.030556960143187806,
+          "first_joint_rmse_rad": 0.0008201322031845408,
+          "first_gripper_fraction_rmse": 0.03355637775398194
+        }
+      }
+    },
+    "dp_training": {
+      "source": {
+        "record_id": "m4_diffusion/2026-09-11_train_v1",
+        "sha256": "f59a2672f53432207605efaa4a67a204c4e378a71a472649d91b9b348514d2b9",
+        "bytes": 14203
+      },
+      "parameters": 317831,
+      "optimizer_updates": 3600,
+      "selected_epoch": 80,
+      "offline_metrics": {
+        "train": {
+          "joint_rmse_rad": 0.005786561664541235,
+          "gripper_fraction_rmse": 0.055952041880297135,
+          "first_joint_rmse_rad": 0.0005996916650281155,
+          "first_gripper_fraction_rmse": 0.056967928858724405
+        },
+        "validation": {
+          "joint_rmse_rad": 0.005687969352229911,
+          "gripper_fraction_rmse": 0.055912403766160045,
+          "first_joint_rmse_rad": 0.0005757297192440329,
+          "first_gripper_fraction_rmse": 0.05676598119275302
+        },
+        "correction": {
+          "joint_rmse_rad": 0.006476162525023905,
+          "gripper_fraction_rmse": 0.05618963926340097,
+          "first_joint_rmse_rad": 0.0012509184348730134,
+          "first_gripper_fraction_rmse": 0.05666456505163436
+        }
+      }
+    }
+  },
+  "presentation_figures": {
+    "control_overview_zh.png": [
+      "control",
+      "control_curves"
+    ],
+    "adaptive_overview_zh.png": [
+      "adaptive"
+    ],
+    "observer_overview_zh.png": [
+      "additional_experiments.observer"
+    ],
+    "identification_overview_zh.png": [
+      "additional_experiments.identification_control"
+    ],
+    "gripper_force_zh.png": [
+      "additional_experiments.gripper_force"
+    ],
+    "trajectory_zh.png": [
+      "additional_experiments.trajectory"
+    ],
+    "robotics_chain.svg": [
+      "conceptual module relationship; no experimental data"
+    ],
+    "learning_chain.svg": [
+      "conceptual model and evaluation relationship; no experimental data"
+    ]
+  }
+}

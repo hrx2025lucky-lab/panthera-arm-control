@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350">
+<rect width="1200" height="350" rx="16" fill="#f3f7fb"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#497ca5"/></marker></defs>
+<g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif">
+<text x="38" y="57" font-size="30" font-weight="700" fill="#142b43">机器人学如何进入完整抓放闭环</text>
+<rect x="38" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="56" y="143" font-size="23" font-weight="700" fill="#2563eb">末端任务</text>
+<text x="56" y="181" font-size="19" fill="#142b43">目标位置 / 朝向</text>
+<text x="56" y="211" font-size="19" fill="#61758a">TCP = tool_link</text>
+<path d="M245 170 H267" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="272" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="290" y="143" font-size="23" font-weight="700" fill="#2563eb">几何模型</text>
+<text x="290" y="181" font-size="19" fill="#142b43">正逆运动学 / J</text>
+<text x="290" y="211" font-size="19" fill="#61758a">六轴与独立双指</text>
+<path d="M479 170 H501" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="506" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="524" y="143" font-size="23" font-weight="700" fill="#2563eb">运动参考</text>
+<text x="524" y="181" font-size="19" fill="#142b43">碰撞约束 / 插补</text>
+<text x="524" y="211" font-size="19" fill="#61758a">q、速度、加速度</text>
+<path d="M713 170 H735" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="740" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="758" y="143" font-size="23" font-weight="700" fill="#2563eb">动力学控制</text>
+<text x="758" y="181" font-size="19" fill="#142b43">M、速度项、g</text>
+<text x="758" y="211" font-size="19" fill="#61758a">误差 → 关节力矩</text>
+<path d="M947 170 H969" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="974" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="992" y="143" font-size="23" font-weight="700" fill="#2563eb">物理与回读</text>
+<text x="992" y="181" font-size="19" fill="#142b43">MuJoCo 接触</text>
+<text x="992" y="211" font-size="19" fill="#61758a">实际状态反馈</text>
+<text x="38" y="294" font-size="20" fill="#61758a">基座系表达规划目标，TOOL 系表达末端局部速度；相同模型接口贯穿规划、控制与操作。</text>
+</g></svg>

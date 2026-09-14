@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="350" viewBox="0 0 1200 350">
+<rect width="1200" height="350" rx="16" fill="#f3f7fb"/>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" fill="#497ca5"/></marker></defs>
+<g font-family="Noto Sans CJK SC, Microsoft YaHei, sans-serif">
+<text x="38" y="57" font-size="30" font-weight="700" fill="#142b43">学习算法共用 Panthera 的数据与执行接口</text>
+<rect x="38" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="56" y="143" font-size="23" font-weight="700" fill="#2563eb">数据</text>
+<text x="56" y="181" font-size="19" fill="#142b43">同拍状态 / 动作</text>
+<text x="56" y="211" font-size="19" fill="#61758a">按布局划分数据</text>
+<path d="M245 170 H267" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="272" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="290" y="143" font-size="23" font-weight="700" fill="#2563eb">策略模型</text>
+<text x="290" y="181" font-size="19" fill="#142b43">BC / ACT / DP</text>
+<text x="290" y="211" font-size="19" fill="#61758a">状态 → 动作序列</text>
+<path d="M479 170 H501" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="506" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="524" y="143" font-size="23" font-weight="700" fill="#2563eb">参考与限幅</text>
+<text x="524" y="181" font-size="19" fill="#142b43">动作块 / PPO 残差</text>
+<text x="524" y="211" font-size="19" fill="#61758a">六轴 + 夹爪通道</text>
+<path d="M713 170 H735" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="740" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="758" y="143" font-size="23" font-weight="700" fill="#2563eb">控制执行</text>
+<text x="758" y="181" font-size="19" fill="#142b43">CTC → MuJoCo</text>
+<text x="758" y="211" font-size="19" fill="#61758a">20 Hz / 500 Hz</text>
+<path d="M947 170 H969" stroke="#497ca5" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="974" y="105" width="204" height="132" rx="10" fill="white" stroke="#cbdae7"/>
+<text x="992" y="143" font-size="23" font-weight="700" fill="#2563eb">任务评价</text>
+<text x="992" y="181" font-size="19" fill="#142b43">接触 / 放稳 / 撤离</text>
+<text x="992" y="211" font-size="19" fill="#61758a">预测误差单独统计</text>
+<text x="38" y="294" font-size="20" fill="#61758a">ACT / DP 使用状态输入；PPO 使用脚本参考辅助。训练完成、预测更准与完整任务成功分别评价。</text>
+</g></svg>
